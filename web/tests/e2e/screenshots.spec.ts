@@ -2,15 +2,14 @@ import { expect, test } from "@playwright/test";
 
 import { libraryTool, openLibrary } from "./helpers";
 
-// Screenshots for PR review (TESTING.md): both themes, both languages, two widths.
+// Screenshots for PR review (TESTING.md): both themes, two widths.
 // Saved to test-results/screenshots/ and uploaded by CI.
 
 const headings = {
   en: { devices: "Devices", library: "Library", game: "Game", add: "Add games", jobs: "Jobs", settings: "Settings" },
-  ru: { devices: "Носители", library: "Библиотека", game: "Игра", add: "Добавить игры", jobs: "Задания", settings: "Настройки" },
 } as const;
 
-for (const language of ["en", "ru"] as const) {
+for (const language of ["en"] as const) {
   for (const theme of ["light", "dark"] as const) {
     for (const width of [1280, 800]) {
       test(`screenshots ${language} ${theme} ${width}`, async ({ page, request }) => {
@@ -76,7 +75,7 @@ for (const language of ["en", "ru"] as const) {
         await shot("art-slots");
         await page.getByTestId("game-title").scrollIntoViewIfNeeded();
 
-        await page.getByRole("button", { name: language === "en" ? "Move to DVD" : "Перенести в DVD" }).click();
+        await page.getByRole("button", { name: "Move to DVD" }).click();
         const plan = page.getByTestId("plan-dialog");
         await expect(plan.getByTestId("plan-summary")).toBeVisible();
         await shot("plan");
@@ -84,7 +83,7 @@ for (const language of ["en", "ru"] as const) {
         await expect(plan).toBeHidden();
 
         // A deletion plan: the user's file highlighted and the extra checkbox.
-        await page.getByRole("button", { name: language === "en" ? "Delete" : "Удалить", exact: true }).click();
+        await page.getByRole("button", { name: "Delete", exact: true }).click();
         await page.getByTestId("delete-preview").click();
         await expect(plan.getByTestId("plan-summary")).toBeVisible();
         await shot("delete-plan");
@@ -109,7 +108,7 @@ for (const language of ["en", "ru"] as const) {
         await expect(page.getByTestId("plan-confirm")).toBeEnabled();
         await page.getByTestId("import-plan").scrollIntoViewIfNeeded();
         await shot("import-plan");
-        await page.getByTestId("import-plan").getByRole("button", { name: language === "en" ? "Cancel" : "Отмена" }).click();
+        await page.getByTestId("import-plan").getByRole("button", { name: "Cancel" }).click();
 
         await page.goto("/jobs");
         await heading("jobs");
@@ -126,7 +125,7 @@ for (const language of ["en", "ru"] as const) {
 }
 
 // The same screens in simple mode, the app's default (UI-4).
-for (const language of ["en", "ru"] as const) {
+for (const language of ["en"] as const) {
   for (const theme of ["light", "dark"] as const) {
     for (const width of [1280, 800]) {
       test(`simple mode screenshots ${language} ${theme} ${width}`, async ({ page, request }) => {

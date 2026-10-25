@@ -12,6 +12,7 @@ import { artCache, attribution, clearArtCache } from "@/api/rpc";
 import { call } from "@/api/transport";
 import { ExternalLink } from "@/components/ExternalLink";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
+import { languages } from "@/i18n";
 import { PageScroll } from "@/components/PageScroll";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -81,9 +82,11 @@ export function SettingsPage() {
                 data-testid="simple-mode"
               />
             </SettingRow>
-            <SettingRow label={t("settings.language")}>
-              <LanguageSwitch showNames />
-            </SettingRow>
+            {languages.length > 1 && (
+              <SettingRow label={t("settings.language")}>
+                <LanguageSwitch showNames />
+              </SettingRow>
+            )}
             <SettingRow label={t("settings.theme")}>
               <ToggleGroup
                 type="single"

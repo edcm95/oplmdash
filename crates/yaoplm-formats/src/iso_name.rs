@@ -295,8 +295,8 @@ mod tests {
         let old = format!("SLUS_200.62.{}.iso", "T".repeat(TITLE_MAX));
         assert!(classify(&old).is_ok());
         // Characters, not UTF-8 bytes.
-        let cyrillic = format!("{}.iso", "Ж".repeat(TITLE_MAX));
-        assert!(classify(&cyrillic).is_ok());
+        let multibyte = format!("{}.iso", "é".repeat(TITLE_MAX));
+        assert!(classify(&multibyte).is_ok());
     }
 
     #[test]

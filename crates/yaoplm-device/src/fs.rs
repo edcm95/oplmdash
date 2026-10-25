@@ -548,13 +548,13 @@ mod tests {
                 len: 0,
             },
             DirEntry {
-                name: "Игра.iso".into(),
+                name: "Game.iso".into(),
                 is_dir: false,
                 len: 0,
             },
         ];
         assert_eq!(find_entry(&entries, "CD").unwrap().name, "cd");
-        assert_eq!(find_entry(&entries, "игра.ISO").unwrap().name, "Игра.iso");
+        assert_eq!(find_entry(&entries, "game.ISO").unwrap().name, "Game.iso");
         assert!(find_entry(&entries, "DVD").is_none());
     }
 

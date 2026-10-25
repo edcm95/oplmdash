@@ -61,7 +61,7 @@ pub struct LoaderBuild {
     pub recommended: bool,
     pub devices: Vec<LoaderTarget>,
     pub license: LoaderLicense,
-    /// By interface language (`en`, `ru`).
+    /// By interface language (`en`).
     pub summary: BTreeMap<String, String>,
     pub limits: BTreeMap<String, String>,
     pub docs: Vec<LoaderDoc>,
@@ -1230,7 +1230,7 @@ mod tests {
         assert_eq!(catalog.builds[0].profile, LoaderProfile::Opl110);
         assert_eq!(beta.channel.tag, "latest");
         assert!(beta.channel.floating);
-        assert_eq!(beta.summary.keys().collect::<Vec<_>>(), ["en", "ru"]);
+        assert_eq!(beta.summary.keys().collect::<Vec<_>>(), ["en"]);
         let usb = beta
             .default_presets
             .iter()

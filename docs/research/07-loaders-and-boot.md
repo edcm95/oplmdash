@@ -779,11 +779,11 @@ Every install is a plan:
    - Add an **MMCE** column (1.1.0: no; 1.2.0 beta: no; MMCE fork: yes; RiptOPL: yes; wOPL: yes; NHDDL: yes).
    - Add a **wOPL** row: "CFG in libconfig since 2026-06; read-only for us".
    - Add an **MMCE fork** row, or fold it into a "OPL 1.2.0 beta (MMCE fork)" variant.
-2. **RiptOPL row**: replace "8-битный индексированный PNG (обязательность не подтверждена)" with "PNG ≤8 бит на канал (16-бит отвергается); индексированный — рекомендация; удвоенные COV/ICO — опция HD". **Close open question 1.**
-3. **§4 storage list**: add "SD-карта MMCE (SD2PSX / MemCard PRO 2) как обычная папка, с защитой служебных путей".
+2. **RiptOPL row**: replace "8-bit indexed PNG (mandatory status unconfirmed)" with "PNG ≤8 bits per channel (16-bit rejected); indexed — recommended; doubled COV/ICO — HD option". **Close open question 1.**
+3. **§4 storage list**: add "MMCE SD card (SD2PSX / MemCard PRO 2) as a regular folder, with protection of service paths".
 4. **ART-2 / ART-6**: always write 8 bits per channel. The RiptOPL HD preset is optional. Art keys: VCD stem, Ember folder, app ELF name; apps on the same device.
 5. **CFG-1**: add "detect non key=value (libconfig) CFG and refuse to rewrite it".
-6. **§5.9**: add the LDR-*/BOOT-* block. **§8** already excludes writing to a physical memory card ("запись на физическую карту памяти"); add "launcher configs (FMCB/PS2BBL/OSDMenu)" and "MMCE firmware and card settings".
+6. **§5.9**: add the LDR-*/BOOT-* block. **§8** already excludes writing to a physical memory card ("writing to a physical memory card"); add "launcher configs (FMCB/PS2BBL/OSDMenu)" and "MMCE firmware and card settings".
 
 ### 6.9 Open questions for the owner (concrete list)
 

@@ -367,7 +367,7 @@ mod tests {
 
     #[test]
     fn signed_checksums_are_accepted() {
-        let name = "ART/Обложки/SLUS_200.62_COV.png";
+        let name = "ART/Covers/SLUS_200.62_COV.png";
         let mut tar = file(name, b"cover");
         let signed: i64 = tar[..BLOCK]
             .iter()

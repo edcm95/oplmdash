@@ -57,7 +57,7 @@ test("a program that is not OPL is replaced only when ticked, and kept as a back
   const foreign = Buffer.concat([Buffer.from("\x7fELF", "latin1"), Buffer.from("wLaunchELF 4.43a")]);
   writeFileSync(path.join(stick, "APPS", "OPNPS2LD.ELF"), foreign);
 
-  await openLibrary(page, request, { language: "ru" });
+  await openLibrary(page, request, { language: "en" });
   await stickAsUsb(page);
   await page.goto("/devices");
   await stickCard(page).getByTestId("device-install-loader").click();
@@ -75,7 +75,7 @@ test("a program that is not OPL is replaced only when ticked, and kept as a back
 
   const hints = page.getByTestId("loader-boot-hints");
   await expect(hints.getByTestId("loader-boot-hint")).toHaveAttribute("data-launcher", "ps2bbl");
-  await expect(hints).toContainText("стандартный конфиг запускает mass:/APPS/OPNPS2LD.ELF");
+  await expect(hints).toContainText("the stock config starts mass:/APPS/OPNPS2LD.ELF");
 
   const backups = path.join(stick, ".yaoplm", "backup", "loader");
   const stamps = readdirSync(backups);
@@ -85,7 +85,7 @@ test("a program that is not OPL is replaced only when ticked, and kept as a back
 });
 
 // The wizard, its plan and the launcher's lines for PR review (TESTING.md).
-for (const language of ["en", "ru"] as const) {
+for (const language of ["en"] as const) {
   for (const theme of ["light", "dark"] as const) {
     test(`loader install screenshots ${language} ${theme}`, async ({ page, request }) => {
       const stick = await emptyStick(request);

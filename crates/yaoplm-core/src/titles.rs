@@ -424,7 +424,7 @@ mod tests {
             Some("Karat PS2-you Pro Action Replay")
         );
         assert!(is_latin("Pokémon Colosseum – Édition «Spéciale»"));
-        assert!(!is_latin("Тетрис"));
+        assert!(!is_latin("テトリス"));
     }
 
     #[test]

@@ -27,14 +27,6 @@ describe("App", () => {
     expect(screen.queryByText("Connected")).not.toBeInTheDocument();
   });
 
-  it("switches language to Russian", async () => {
-    renderAt("/");
-    await userEvent.click(screen.getByRole("radio", { name: "Русский" }));
-    expect(screen.getByRole("heading", { level: 1, name: "Библиотека" })).toBeInTheDocument();
-    expect(document.documentElement.lang).toBe("ru");
-    expect(window.localStorage.getItem("yaoplm.language")).toBe("ru");
-  });
-
   it("toggles the dark theme", async () => {
     renderAt("/");
     await userEvent.click(screen.getByRole("button", { name: "Switch to dark theme" }));

@@ -19,32 +19,27 @@ describe("notice texts", () => {
     await i18n.changeLanguage("en");
   });
 
-  it("show the phrase with its names and sizes in the current language", async () => {
+  it("show the phrase with its names and sizes in English", () => {
     const space = notice("noSpace", "Not enough free space: 5.0 GiB needed, 1.0 MiB available", {
       key: "notices.noSpace",
       params: { needed: 5 * 2 ** 30, free: 2 ** 20 },
     });
-    const { result, rerender } = renderHook(() => useNoticeText());
+    const { result } = renderHook(() => useNoticeText());
     expect(result.current(space)).toBe("Not enough free space: 5.0 GiB needed, 1.0 MiB available");
-    await i18n.changeLanguage("ru");
-    rerender();
-    expect(result.current(space)).toBe("Не хватает места: нужно 5,0 ГиБ, свободно 1,0 МиБ");
   });
 
-  it("translate a nested reason", async () => {
-    await i18n.changeLanguage("ru");
+  it("translate a nested reason", () => {
     const { result } = renderHook(() => useNoticeText());
     const hidden = notice("noStartup", "OPL hides this image: SYSTEM.CNF has no BOOT2 line", {
       key: "notices.noStartup",
       params: { reason: { key: "reasons.noBoot2", params: {} } },
     });
     expect(result.current(hidden)).toBe(
-      "OPL скрывает этот образ: в SYSTEM.CNF нет строки BOOT2 (диск PS1, видео-DVD или повреждённый образ)",
+      "OPL hides this image: SYSTEM.CNF has no BOOT2 line (a PS1 disc, a video DVD or a damaged image)",
     );
   });
 
-  it("show the English message of a notice without a phrase", async () => {
-    await i18n.changeLanguage("ru");
+  it("show the English message of a notice without a phrase", () => {
     const { result } = renderHook(() => useNoticeText());
     expect(result.current(notice("noSpace", "not enough free space: 5 bytes needed, 1 available"))).toBe(
       "not enough free space: 5 bytes needed, 1 available",

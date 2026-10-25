@@ -18,7 +18,7 @@ family: string, name: string, publisher: LoaderPublisher,
  */
 repo: string, profile: LoaderProfile, recommended: boolean, devices: Array<LoaderTarget>, license: LoaderLicense, 
 /**
- * By interface language (`en`, `ru`).
+ * By interface language (`en`).
  */
 summary: { [key in string]: string }, limits: { [key in string]: string }, docs: Array<LoaderDoc>, channel: LoaderChannel, presets: Array<LoaderPreset>, 
 /**

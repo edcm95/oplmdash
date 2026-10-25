@@ -1169,12 +1169,6 @@ fn loader_ls_lists_the_catalogue() {
         assert!(text.contains(line), "{line}\n{text}");
     }
 
-    let ru = yaoplm()
-        .args(["loader", "ls", "--lang", "ru"])
-        .output()
-        .unwrap();
-    assert!(stdout(&ru).contains("Официальная бета"), "{}", stdout(&ru));
-
     let json = yaoplm().args(["loader", "ls", "--json"]).output().unwrap();
     let value: serde_json::Value = serde_json::from_slice(&json.stdout).unwrap();
     assert_eq!(value["type"], "LoaderCatalog");

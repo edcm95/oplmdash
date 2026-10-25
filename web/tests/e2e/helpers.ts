@@ -31,7 +31,7 @@ export function joinPath(root: string, ...names: string[]): string {
 export async function openLibrary(
   page: Page,
   request: APIRequestContext,
-  extra: { language?: "en" | "ru"; theme?: "light" | "dark"; view?: "grid" | "list"; simple?: boolean } = {},
+  extra: { language?: "en"; theme?: "light" | "dark"; view?: "grid" | "list"; simple?: boolean } = {},
 ): Promise<string> {
   const { library, mirror } = await roots(request);
   // The picture sources read the fixture mirrors instead of the network;

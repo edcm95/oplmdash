@@ -90,7 +90,7 @@ fn the_catalogue_is_one_request_away() {
         .collect();
     assert_eq!(recommended, ["opl-beta"]);
     for build in builds {
-        assert!(build["summary"]["en"].is_string() && build["summary"]["ru"].is_string());
+        assert!(build["summary"]["en"].is_string());
         assert_eq!(build["license"]["spdx"], "AFL-3.0");
         let presets: Vec<&str> = build["presets"]
             .as_array()

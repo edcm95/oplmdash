@@ -13,7 +13,7 @@ use super::version::BuildVersion;
 use super::{CatalogError, SCHEMA};
 use crate::detect::Family;
 
-/// Texts by interface language (`en`, `ru`): the catalogue changes without
+/// Texts by interface language (`en`): the catalogue changes without
 /// a new program, so build descriptions live here, not in the UI catalogues.
 pub type Texts = BTreeMap<String, String>;
 
@@ -69,7 +69,7 @@ pub enum Publisher {
     Fork,
 }
 
-/// Where a build can run from (SPEC §4 "Носители").
+/// Where a build can run from (SPEC §4 "Media").
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Target {
@@ -649,7 +649,7 @@ mod tests {
     #[test]
     fn texts_exist_in_every_interface_language() {
         let languages = languages();
-        assert!(languages.contains("en") && languages.contains("ru"));
+        assert!(languages.contains("en"));
         for build in &built_in().unwrap().builds {
             for (field, texts) in [("summary", &build.summary), ("limits", &build.limits)] {
                 let have: BTreeSet<String> = texts.keys().cloned().collect();
@@ -669,9 +669,6 @@ mod tests {
                 assert!(!text.contains("  "), "{at}");
                 assert!(!text.contains(" ,") && !text.contains(" ."), "{at}");
                 assert!(text.ends_with('.'), "{at}");
-                if lang == "ru" {
-                    assert!(!text.contains(" - "), "{at}: a dash, not a hyphen");
-                }
             }
         }
     }

@@ -18,11 +18,9 @@ authors = "ps2homebrew and the Open PS2 Loader contributors"
 
 [summary]
 en = "The official stable release from 2021. Proven over years and named in older guides; reads PNG, JPG and BMP covers."
-ru = "Официальный стабильный выпуск 2021 года. Проверен годами, на него ссылаются старые инструкции; читает обложки PNG, JPG и BMP."
 
 [limits]
 en = "No exFAT and no ZSO; every game file must be in one piece; no fixes since 2021."
-ru = "Нет exFAT и ZSO; каждый файл игры должен лежать одним куском; исправлений после 2021 года нет."
 
 [[docs]]
 kind = "readme"

@@ -7,7 +7,7 @@
 //! rewritten), and the steps after it only finish the job (removing
 //! `games.bin`, deleting what the user asked to delete). A crash before the
 //! commit is rolled back, a crash after it is completed (research/02 §5,
-//! SPEC §6 "Безопасность данных").
+//! SPEC §6 "Data safety").
 //!
 //! Plans are plain data: planners build them from what is on the device,
 //! [`crate::exec`] runs them, and the journal stores them as JSON.

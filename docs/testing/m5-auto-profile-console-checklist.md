@@ -1,34 +1,34 @@
-# M5: автоопределение профиля загрузчика — проверка (LIB-1)
+# M5: automatic loader profile detection — check (LIB-1)
 
-Что проверяем: YAOPLM сам понимает, под какой OPL подготовлен носитель, показывает это на карточке носителя и в шапке библиотеки, а выбор «для этого носителя» запоминается и действует на всё (сканирование, добавление, конвертации, настройки игр). Подробности — ADR-0039, research/16, SPEC §5.1.1.
+What we check: YAOPLM understands on its own which OPL a device is prepared for, shows it on the device card and in the library header, and the "for this device" choice is remembered and applies to everything (scanning, adding, conversions, game settings). Details — ADR-0039, research/16, SPEC §5.1.1.
 
-Консоль здесь нужна только в шаге 5. Остальное проверяется в программе: она не пишет на носитель ничего, кроме того, что вы сами добавите шагами ниже.
+The console is needed only in step 5. The rest is checked in the program: it writes nothing to the device except what you add yourself in the steps below.
 
-## Что нужно
+## What is needed
 
-- Флешка E: (или любая тестовая FAT32).
-- Официальный архив OPL 1.1.0 с GitHub (`OPNPS2LD-v1.1.0.7z`, релиз v1.1.0) — для шага 3. Он уже скачан в `D:\yaoplm-testdata\downloads\opl-v1.1.0\`.
+- Stick E: (or any test FAT32).
+- The official OPL 1.1.0 archive from GitHub (`OPNPS2LD-v1.1.0.7z`, release v1.1.0) — for step 3. It is already downloaded to `D:\yaoplm-testdata\downloads\opl-v1.1.0\`.
 
-## Шаги
+## Steps
 
-1. **Флешка без загрузчика** (как сейчас E:: OPL запускается с карты памяти).
-   - «Носители»: на карточке E: строка «Загрузчик: OPL 1.2.0 beta — на носителе нет признаков загрузчика».
-   - То же в шапке библиотеки рядом с числом игр, в простом и в расширенном режиме.
+1. **Stick without a loader** (as E: is now: OPL launches from the memory card).
+   - "Devices": on the E: card the row "Loader: OPL 1.2.0 beta — no signs of a loader on the device".
+   - The same in the library header next to the game count, in simple and in advanced mode.
    - `yaoplm device E:\` → `Loader: OPL 1.2.0 beta: no signs of a loader on the device (auto)`.
-2. **Выбор для носителя.** В шапке библиотеки «Изменить» → «OPL 1.1.0».
-   - Строка: «OPL 1.1.0 — выбран для этого носителя»; советы на карточке носителя — для 1.1.0.
-   - Отключите и снова вставьте флешку (можно под другой буквой): выбор сохранился, он привязан к серийному номеру тома.
-   - «Изменить» → «Авто (по носителю)» возвращает определение.
-3. **OPL 1.1.0 на флешке.** Положите `OPNPS2LD-v1.1.0.ELF` из архива на флешку как `UPDT\OPL.ELF` (путь FMCB 1.966).
-   - Строка: «OPL 1.1.0 — OPL v1.1.0 в UPDT/OPL.ELF, опознан по контрольной сумме».
-   - Если на флешке есть ZSO, ниже предупреждение, что OPL 1.1.0 их не видит.
-4. **Следы OPL 1.2.** Запустите с этой флешки любой OPL 1.2 beta (или YAOPL) и дайте ему открыть список игр — он запишет `CD/games.bin` / `DVD/games.bin` с записями по 188 байт.
-   - Профиль остаётся по контрольной сумме (OPL 1.1.0), но появляется уведомление: «Игры на этом носителе последней просматривала бета OPL 1.2 со сборки 2017 или форк…».
-   - Удалите `UPDT\OPL.ELF`: теперь «OPL 1.2.0 beta — DVD/games.bin последней записала бета со сборки 2017 или форк OPL 1.2».
-5. **Консоль (по желанию).** OPL 1.1.0 из шага 3, запущенный с флешки, должен показать игры. ZSO 1.1.0 не показывает: программа предупреждала об этом на шаге 3.
-6. **Убрать за собой.** Удалите `UPDT\OPL.ELF`, если ещё лежит, и верните «Авто».
+2. **Choice for the device.** In the library header "Change" → "OPL 1.1.0".
+   - The row: "OPL 1.1.0 — chosen for this device"; the advice on the device card — for 1.1.0.
+   - Unplug and plug the stick back in (possibly under another letter): the choice is saved, it is bound to the volume serial number.
+   - "Change" → "Auto (by device)" restores detection.
+3. **OPL 1.1.0 on the stick.** Put `OPNPS2LD-v1.1.0.ELF` from the archive on the stick as `UPDT\OPL.ELF` (the FMCB 1.966 path).
+   - The row: "OPL 1.1.0 — OPL v1.1.0 in UPDT/OPL.ELF, identified by checksum".
+   - If the stick has ZSO, there is a warning below that OPL 1.1.0 does not see them.
+4. **Traces of OPL 1.2.** Launch any OPL 1.2 beta (or YAOPL) from this stick and let it open the game list — it will write `CD/games.bin` / `DVD/games.bin` with 188-byte records.
+   - The profile stays by checksum (OPL 1.1.0), but a notice appears: "The games on this device were last listed by an OPL 1.2 beta from build 2017 or a fork…".
+   - Delete `UPDT\OPL.ELF`: now "OPL 1.2.0 beta — DVD/games.bin was last written by a beta from build 2017 or an OPL 1.2 fork".
+5. **Console (optional).** OPL 1.1.0 from step 3, launched from the stick, must show the games. ZSO is not shown by 1.1.0: the program warned about this in step 3.
+6. **Clean up.** Delete `UPDT\OPL.ELF` if it is still there and return "Auto".
 
-## Что прислать
+## What to report
 
-- Для каждого шага: «как ожидалось» или что было вместо этого (фото или скриншот подойдёт).
-- Вывод `yaoplm device E:\` после шагов 3 и 4.
+- For each step: "as expected" or what happened instead (a photo or screenshot is fine).
+- The output of `yaoplm device E:\` after steps 3 and 4.

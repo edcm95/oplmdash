@@ -1,5 +1,5 @@
 //! Builds a small OPL library for checking `yaoplm scan` against what OPL
-//! lists on the console (ROADMAP M1 "Готово, когда").
+//! lists on the console (ROADMAP M1 "Done when").
 //!
 //! ```text
 //! cargo run -p yaoplm-core --example make_check_library -- \

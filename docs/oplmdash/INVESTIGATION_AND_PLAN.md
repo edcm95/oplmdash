@@ -47,7 +47,7 @@ One existing open-source project already implements almost exactly this:
   token auth, root allow-list, JSON-RPC over HTTP, WebSocket job events, SPA embedding,
   path traversal protection, plan -> confirm -> execute, atomic writes, journal/recovery,
   byte-exact OPL formats, fuzzing, and ~113 Rust test files.
-- It is **pre-alpha**, docs are mostly Russian, there is **no Dockerfile yet** (roadmap item SRV-1 is open),
+- It is **pre-alpha**, upstream docs were mostly Russian (translated in this fork), there is **no Dockerfile yet** (roadmap item SRV-1 is open),
   it has **no browser upload** (imports only from paths already inside the server roots), and auth is a
   single shared token.
 
@@ -375,7 +375,7 @@ Appendix A for the source references, corrections, and the "what would break OPL
 - Server: `POST /api/rpc`, WebSocket `/api/events`, `GET /media/art`, `GET /health`, SPA fallback.
   Token auth, root allow-list, loopback by default, DNS-rebinding protection.
 - Gaps for us: no Dockerfile (roadmap SRV-1), no browser upload, single token auth, no users/audit,
-  docs Russian, pre-alpha, API may churn.
+  upstream docs were Russian (translated here), pre-alpha, API may churn.
 - Some choices we may not need: Tauri desktop, loader installation/update, Redump verification,
   ScreenScraper. They can stay dormant or be trimmed in the `oplmdash` UI.
 
@@ -465,7 +465,7 @@ Costs/risks:
 - GPL-3.0-or-later for the whole product;
 - learning a 66k LOC Rust codebase;
 - upstream is pre-alpha and may churn; keep divergence small and send fixes upstream;
-- Russian docs; we will write our own English docs.
+- Upstream docs were Russian; this fork translated them to English.
 
 ### 4.2 Option B - Thin wrapper around upstream `yaoplm-server`
 
@@ -632,7 +632,7 @@ Key rules:
 - SQLite via rusqlite (bundled) for cache/auth/audit.
 - Docker multi-stage: pnpm build -> cargo build (musl) -> distroless/static; non-root.
 - Generated TS types via ts-rs; CI checks freshness.
-- i18n: English first; keep yaoplm's en/ru if inherited.
+- i18n: English only; inherited Russian support was removed.
 
 If clean-room: Rust + axum + React is still the best fit for large-file I/O and single-binary
 Docker. A TypeScript-only stack (Fastify/NestJS + React) is faster to write but weaker for raw

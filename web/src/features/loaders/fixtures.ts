@@ -23,7 +23,7 @@ export function build(id: string, patch: Partial<LoaderBuild> = {}): LoaderBuild
     recommended: id === "opl-beta",
     devices: ["usb", "mx4sio"],
     license: { spdx: "AFL-3.0", url: "https://github.com/ps2homebrew/Open-PS2-Loader/blob/master/LICENSE", authors: "OPL team" },
-    summary: { en: `${id} in English`, ru: `${id} по-русски` },
+    summary: { en: `${id} in English` },
     limits: {},
     docs: [{ kind: "readme", url: "https://github.com/ps2homebrew/Open-PS2-Loader#readme" }],
     channel: { tag: "latest", floating: true, prerelease: false },

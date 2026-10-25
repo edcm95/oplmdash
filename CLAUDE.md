@@ -11,8 +11,8 @@ Read before working:
 - `docs/research/`: source research. `02-opl-formats.md` is the format reference; cite its sections in code comments where a rule comes from OPL source.
 
 ## Communication
-- Talk to the user in **Russian**. They own the product, test on a real PS2 and review PRs.
-- Write code, comments, commit messages, PR titles and descriptions, README and i18n keys in **English**. Docs in `docs/` are in Russian.
+- Talk to the user in **English**. They own the product, test on a real PS2 and review PRs.
+- Write code, comments, commit messages, PR titles and descriptions, README and i18n keys in **English**. Docs in `docs/` are in English.
 - At the end of each milestone, give the user a short checklist of what to test on the console.
 - If you need something from the user (disc dumps, a USB stick prepared by OPL Manager, console tests), ask with a concrete list.
 
@@ -74,7 +74,7 @@ Read before working:
 - Tauri 2.12, axum 0.8, clap, ts-rs 12.
 - Do not use tauri-specta (still RC), `serde_yaml` (archived) or `serde_yml` (unsound). Use `serde_norway` or `serde_yaml_ng` for YAML.
 - Formats and data: hadris-iso 2.5, chd 0.4 (feature `chd`), zip 9, sevenz-rust2 0.24, `unrar` only behind feature `rar`, crc32fast, sha1/md-5 0.11, lz4_flex 0.14, image 0.25, fast_image_resize 6, quick-xml 0.42, reqwest 0.13 (rustls), rusqlite (bundled), windows-sys 0.61 and rustix 1.1 for volumes (ADR-0019; no sysinfo), smb 0.12 (feature `smb`).
-- Frontend: React 19, TypeScript 6 (strict), Vite 8, pnpm 12 (via corepack), TanStack Query, TanStack Virtual, shadcn/ui (`radix-nova`, `cn` helper), Tailwind 4, React Router 7, react-i18next (`en`, `ru`), vitest, Playwright.
+- Frontend: React 19, TypeScript 6 (strict), Vite 8, pnpm 12 (via corepack), TanStack Query, TanStack Virtual, shadcn/ui (`radix-nova`, `cn` helper), Tailwind 4, React Router 7, react-i18next (`en`), vitest, Playwright.
   - Stay on TypeScript 6 until typescript-eslint supports TS 7 (it requires `<6.1` as of 2026-10-22).
   - React Router 8 exists; moving to it needs an ADR.
 - Before adding a crate or npm package, check its maintenance and licence. GPL-3-compatible only.
@@ -88,7 +88,7 @@ Read before working:
   - small modules, one format per module in `yaoplm-formats`.
 - Each format module starts with a doc comment that links the research/02 section and the OPL source file it mirrors.
 - TS: strict mode, no `any`. API types come only from `web/src/api/generated/` (ts-rs output), never hand-written.
-- i18n (`docs/I18N.md`): every user-visible string goes through i18n, with keys in every supported language (`en`, `ru`) in the same commit as the feature, following the glossary, plural and typography rules there. Texts the core shows to users are `Phrase`s (`Phrase::title`/`error`/`notice`/`reason` with named params, crate `yaoplm-i18n`), never English-only strings: the core renders English from the `en` catalogue, so a new key goes into every language in the same commit, and the i18n test checks that each phrase sets exactly the parameters its template uses (ADR-0029). Technical details (OS messages, parser positions) go in as text parameters. `pnpm -C web test` checks key parity, plural forms, placeholders, duplicate keys, typography, untranslated copies and that every core notice code and keyed enum value has a translation; reread new strings in both languages before a PR.
+- i18n (`docs/I18N.md`): every user-visible string goes through i18n, with its key in the English catalogue (`en`) in the same commit as the feature, following the glossary and typography rules there. Texts the core shows to users are `Phrase`s (`Phrase::title`/`error`/`notice`/`reason` with named params, crate `yaoplm-i18n`), never English-only strings: the core renders English from the `en` catalogue, so a new key goes into `en` in the same commit, and the i18n test checks that each phrase sets exactly the parameters its template uses (ADR-0029). Technical details (OS messages, parser positions) go in as text parameters. `pnpm -C web test` checks placeholders, duplicate keys, typography and that every core notice code and keyed enum value has a translation; reread new strings before a PR.
 - Keep comments sparse and factual: why, not what.
 
 ## Commands
@@ -119,7 +119,7 @@ Update this section if they change.
 - Picture sources on the live network, by hand, never in CI: `YAOPLM_LIVE=1 cargo test -p yaoplm-net --test live -- --ignored --nocapture`.
 - Picture source coverage (real data): `python scripts/art-source-lists.py D:\yaoplm-testdata\art-lists`, then `YAOPLM_TESTDATA=D:\yaoplm-testdata cargo test -p yaoplm-api --test art_coverage -- --ignored --nocapture`.
 - Real FAT32/exFAT drivers (Linux, mounted image files; CI job `real-fs`): `YAOPLM_FAT32_DIR=/mnt/fat32 YAOPLM_EXFAT_DIR=/mnt/exfat cargo test -p yaoplm-core --test real_fs -- --ignored`. Fragment counts on them (IMP-7b; also macOS, CI job `real-fs-macos`): `cargo test -p yaoplm-device --test fragments -- --ignored fragments_on_real_drivers --nocapture` with the same variables; `YAOPLM_FRAGMENTS_KNOWN=1|0` says whether the OS must tell (Linux tells root only; macOS 15 does not tell on FAT32/exFAT).
-- Loader catalogue (LDR-1, ADR-0042): `yaoplm loader ls [--lang en|ru] [--json]`. Data: `data/loaders/index.toml` plus one `<id>.toml` per build. No hash history of new builds: a build is known by the version inside its ELF (ADR-0041); `data/loader-hashes/opl-stable.txt` only holds frozen releases.
+- Loader catalogue (LDR-1, ADR-0042): `yaoplm loader ls [--lang en] [--json]`. Data: `data/loaders/index.toml` plus one `<id>.toml` per build. No hash history of new builds: a build is known by the version inside its ELF (ADR-0041); `data/loader-hashes/opl-stable.txt` only holds frozen releases.
 - Loader downloads (LDR-2, ADR-0043; the app data `loaders/` store, no device is touched): `yaoplm loader release <build> [--tag T] [--mirror DIR]` (what a download would be), `yaoplm loader download <build> [--tag T] [--mirror DIR] [--yes]` (held to the hash it printed), `yaoplm loader import <file>` (own ELF, zip or 7z; no network), `yaoplm loader files`, `yaoplm loader update-catalog [--mirror DIR]`. A mirror has GitHub's layout (`repos/<o>/<r>/releases/tags/<tag>.json`, `<o>/<r>/releases/download/<tag>/<asset>`, `data/loaders/`); `yaoplm_test_support::loaders::ReleaseMirror::official` writes one with test ELFs. Tests and CI always use mirrors.
 - Loader install (LDR-3, BOOT-1, ADR-0044): `yaoplm loader install <root> <build> [--preset fmcb|ps2bbl|app]... [--path P] [--mx4sio] [--language Russian] [--starter-settings] [--replace-foreign] [--file F | --tag T --mirror DIR]` downloads (after a confirmation), plans, and prints the launcher lines. Updates and rollbacks (LDR-4, ADR-0045): `yaoplm loader update <root> [--path P] [--mirror DIR]` (reads the release, then a plan replacing only the ELF and its language pack), `yaoplm loader rollback <root> [--path P]` (swaps the ELF with its newest backup); `yaoplm device` prints the installed build and whether a newer one is known from the cache. Never at a real drive without the owner's confirmation (rule 1).
 - Console test disc: `cargo run -p yaoplm-test-support --example make_boot_iso -- --elf <homebrew.elf> --out <image.iso> [--min-mib 4300]`
@@ -128,7 +128,7 @@ Update this section if they change.
 - One branch per milestone or task: `m<N>/<slug>`.
 - Conventional Commits in English with requirement IDs: `feat(formats): ul.cfg writer (IMP-5)`.
 - Before every commit: fmt, clippy, tests. Before every PR: the full CI set locally where possible.
-- For UI work, run `yaoplm-server` or the Vite dev server through `.claude/launch.json`. Check it in the browser preview or with Playwright, and attach screenshots (light/dark, en/ru) to the PR.
+- For UI work, run `yaoplm-server` or the Vite dev server through `.claude/launch.json`. Check it in the browser preview or with Playwright, and attach screenshots (light/dark, en) to the PR.
 - PR description: summary, requirement IDs, how it was tested, **PS2 test checklist** for the user.
 - After merge: tick ROADMAP checkboxes and add an ADR if a decision was made.
 - Before a release tag (`v0.N.0`), and after PRs that change the device card, the library header, the storage doctor or the "what next" hints: run the UI consistency pass in `docs/plans/release-ui-consistency.md` (one story per device, no actions that cannot work, one main button, visible reasons, axe on every state).
@@ -141,7 +141,7 @@ Update this section if they change.
 - Docker is not local: Docker images build in CI.
 - Test data lives in `D:\yaoplm-testdata\` (outside the repo). Never commit game images or anything from that folder.
 - The user's PS2 hardware (FMCB card, memory card emulator, MX4SIO, USB sticks) and the console test matrix are in `docs/TESTING.md`. When the user connects a device, inspect it read-only first; write only after a plan, the user's confirmation and a re-check of the disk identity. D: is the user's data drive: write only under `D:\yaoplm-testdata`.
-- Device sessions (`docs/TESTING.md`, "Сессии с устройствами владельца"): the owner will connect sticks and the emulator's factory-prepared microSD. Record every layout read-only first (in `docs/research/`, no binaries), then install and swap OPL builds only through plans, and test on the console.
+- Device sessions (`docs/TESTING.md`, "Sessions with the owner's devices"): the owner will connect sticks and the emulator's factory-prepared microSD. Record every layout read-only first (in `docs/research/`, no binaries), then install and swap OPL builds only through plans, and test on the console.
 - **Shared machine: processes and locks.** Several sessions and the owner use this machine, often the same checkout and `target/`.
   - Before building, testing or starting the app or a server, run `scripts/dev-processes.ps1`. A running `yaoplm-*.exe` from `target\` locks it: cargo fails with "Access is denied" (os error 5). A running desktop app holds the WebView2 profile `%LOCALAPPDATA%\io.github.belomaxorka.yaoplm\EBWebView`: a second instance with other WebView2 arguments (a CDP port) fails with 0x8007139F. Dev ports may be taken.
   - Never stop a process you did not start. The installed app (`%LOCALAPPDATA%\YAOPLM\`) and anything started from the owner's terminal belong to the owner; another session's servers belong to it. Work around them: another port, a dev desktop with its own profile (`WEBVIEW2_USER_DATA_FOLDER=<scratchpad folder>`, which also keeps the owner's settings untouched), or ask the owner.

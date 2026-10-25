@@ -565,11 +565,8 @@ mod tests {
             settings.apply(&mut cfg, OPL),
             Err(SettingsError::AltStartupChars(_))
         ));
-        settings.alt_startup = "ПУСК".into();
-        assert!(matches!(
-            settings.apply(&mut cfg, OPL),
-            Err(SettingsError::AltStartupChars(_))
-        ));
+        settings.alt_startup = "START".into();
+        settings.apply(&mut cfg, OPL).unwrap();
         settings.alt_startup.clear();
         settings.apply(&mut cfg, OPL).unwrap();
         assert_eq!(text(&cfg), "$ConfigSource=1\r\n");

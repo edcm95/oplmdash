@@ -106,13 +106,13 @@ test("Check for updates finds a newer build; it goes on through a plan and rolls
 });
 
 test("Not now is remembered across visits, and the setting turns the window off", async ({ page, request }) => {
-  await setup(page, request, { language: "ru" });
+  await setup(page, request, { language: "en" });
   const { mirror } = await roots(request);
   // The release was read before: the window opens without the network.
   await job(request, { type: "LoaderRelease", build: "opl-beta", mirror: joinPath(mirror, "loaders-next") });
   await page.goto("/devices");
   const dialog = page.getByTestId("loader-update-dialog");
-  await expect(dialog.getByRole("heading", { name: "Доступно обновление" })).toBeVisible();
+  await expect(dialog.getByRole("heading", { name: "Update available" })).toBeVisible();
   await dialog.getByTestId("loader-update-later").click();
   await expect(dialog).toBeHidden();
   await page.reload();
@@ -124,7 +124,7 @@ test("Not now is remembered across visits, and the setting turns the window off"
 });
 
 // The card and the window for PR review (TESTING.md).
-for (const language of ["en", "ru"] as const) {
+for (const language of ["en"] as const) {
   for (const theme of ["light", "dark"] as const) {
     test(`loader update screenshots ${language} ${theme}`, async ({ page, request }) => {
       await page.setViewportSize({ width: 1280, height: 900 });

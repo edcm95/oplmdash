@@ -2,7 +2,7 @@ import i18n from "@/i18n";
 
 const UNITS = ["B", "KiB", "MiB", "GiB", "TiB"] as const;
 
-/** The current language's decimal mark: `531.2` in English, `531,2` in Russian. */
+/** The current language's decimal mark. */
 function decimal(value: number, digits: number): string {
   return new Intl.NumberFormat(i18n.language, {
     minimumFractionDigits: digits,
@@ -11,7 +11,7 @@ function decimal(value: number, digits: number): string {
   }).format(value);
 }
 
-/** Binary units with one decimal, like the CLI: `531.2 MiB`, `531,2 МиБ`. */
+/** Binary units with one decimal, like the CLI: `531.2 MiB`. */
 export function formatBytes(bytes: number, digits = 1): string {
   let value = bytes;
   let unit = 0;

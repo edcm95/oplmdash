@@ -417,12 +417,12 @@ Suggested edits, for the owner to approve; none is applied here.
 | §5.1.1 step 3: "exFAT or ZSO exclude 1.1.0" | Correct, and they also exclude betas before 1880 (exFAT) and 1871 (ZSO) | §1.4 |
 | — (missing) | **`CD/games.bin` and `DVD/games.bin`**: OPL writes them on the game device itself; 92-byte records = 1.1.0 or ≤ Beta-2016, 188-byte records = ≥ Beta-2017 or a 1.2 fork. A strong "last listed by" sign that does not depend on where the config lives | §1.5 |
 | — (missing) | Per-game keys and VMC group names (`XEBP_100.NN_<slot>`) date a 1.2 build; unique state files of RiptOPL, wOPL and NHDDL | §1.3, §1.4, §4–§7 |
-| SPEC §4: "кэш `games.bin`" is listed as a 1.2.0 beta feature | `games.bin` exists in 1.0.0 and 1.1.0 too; only its record size changed | §1.5 |
-| LDR-4: "ELF сжат ps2-packer, строку версии из него не прочитать" | Wrong. The packed release ELF holds a raw LZMA stream at a fixed place (file offset `0x78` in 1.0.0 and 1.1.0); a stock LZMA decoder gives the program with its version string. Unpacked ELFs have it in plain text (2026-10-25, checked on the official archives) | §1.6 |
+| SPEC §4: "`games.bin` cache" is listed as a 1.2.0 beta feature | `games.bin` exists in 1.0.0 and 1.1.0 too; only its record size changed | §1.5 |
+| LDR-4: "the ELF is compressed with ps2-packer; the version string cannot be read from it" | Wrong. The packed release ELF holds a raw LZMA stream at a fixed place (file offset `0x78` in 1.0.0 and 1.1.0); a stock LZMA decoder gives the program with its version string. Unpacked ELFs have it in plain text (2026-10-25, checked on the official archives) | §1.6 |
 | ADR-0023 decision "exact SHA-256 table of OPL 1.1.0 release ELFs" | The table is 17 ELFs (the packed main ELF and 16 variants), all inside 7z files with `digest: null`; building it needs one download. 1.0.0 has the same shape | §1.6 |
 | research/07 §1.9 "Upstream archive member names: `OPNPS2LD-v1.2.0-Beta-2271-b3a2199.ELF`" as version source | Beta numbers collide: YAOPL counts its own commits and the MMCE fork's are upstream's numbers for other code. A version is number + hash + suffix. Hashes of builds made before upstream's history rewrite may not resolve in today's repo | §1.1, §2, §3 |
 | SPEC §5.10.1: YAOPL's CI appends `HASHES.txt` | Not there yet: the release has `SHA256SUMS` for the current build only | §2 |
-| §5.1.1 "Отсутствие `conf_opl.cfg` ничего не значит" | Correct. Also: OPL looks for it at the root of each BDM unit at boot, but saves it under `usb_prefix` when one is set, so read both places | §1.5 |
+| §5.1.1 "The absence of `conf_opl.cfg` means nothing" | Correct. Also: OPL looks for it at the root of each BDM unit at boot, but saves it under `usb_prefix` when one is set, so read both places | §1.5 |
 | Profile "OPL 1.2.0 beta" assumes the newest rules | Betas 1871–1894 read ZSO but still need each game in one piece. A device dated to such a beta (§1.2) is safest with the 1.1.0 fragment rule. Rare; worth a note in the reason, not its own profile. Older betas being more permissive (JPG up to 2168) does no harm | §1.4 |
 
 | Today (SPEC §5.1.1 step 2, research/07) | Correction | Section |

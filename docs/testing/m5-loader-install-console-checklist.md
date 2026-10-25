@@ -1,40 +1,40 @@
-# M5: установка загрузчика — проверка на консоли (LDR-3, BOOT-1)
+# M5: loader installation — console check (LDR-3, BOOT-1)
 
-Что проверяем: YAOPLM ставит официальный OPL на флешку одним планом — папки, ELF туда, где его найдёт стандартный способ запуска, резервную копию прежнего файла, манифест — и после установки говорит, как запустить OPL на PS2. Конфиги на карте памяти программа не трогает. Подробности — ADR-0042, ADR-0044, SPEC §5.10.1.
+What we check: YAOPLM installs official OPL on a stick in one plan — folders, the ELF where the standard launch method will find it, a backup of the previous file, a manifest — and after installation says how to launch OPL on the PS2. The program does not touch configs on the memory card. Details — ADR-0042, ADR-0044, SPEC §5.10.1.
 
-Пишем только на тестовую флешку F: (её можно форматировать). Перед каждой записью программа показывает план; подтверждаете вы.
+We write only to test stick F: (it can be formatted). Before every write the program shows a plan; you confirm.
 
-## Что нужно
+## What is needed
 
-- Флешка F: (FAT32), подключённая к ПК, потом к PS2.
-- FreeMcBoot 1.966 на карте памяти (ваша карта FMCB) и, если есть, PS2BBL.
-- Сеть на ПК: программа скачает OPL 1.2.0 beta с GitHub (тег `latest`, около 1,4 МБ).
+- Stick F: (FAT32), connected to the PC, then to the PS2.
+- FreeMcBoot 1.966 on the memory card (your FMCB card) and, if available, PS2BBL.
+- Network on the PC: the program will download OPL 1.2.0 beta from GitHub (tag `latest`, about 1.4 MB).
 
-## Шаги
+## Steps
 
-1. **Мастер.** «Носители» → карточка F: → «Установить загрузчик…».
-   - Где будет работать носитель: «USB-порт». Способ запуска: «FreeMcBoot с карты памяти» (`UPDT/OPL.ELF`). Сборка: «OPL 1.2.0 beta» с отметкой «Рекомендуем».
-   - Под сборками: версия `v1.2.0-Beta-…`, дата, размер, лицензия AFL-3.0, ссылки на релиз и коммит, «Что нового».
-   - Расширенный режим: отметьте «Меню OPL на языке: Русский» и «Стартовые настройки».
-2. **План.** «Скачать и установить» → план: «Создать папки OPL», «OPL 1.2.0 beta в UPDT/OPL.ELF», язык, «Запомнить установленный загрузчик», стартовые настройки с предупреждением про `conf_opl.cfg` на карте. Подтвердите.
-   - На F: появились `UPDT\OPL.ELF`, папки `CD`, `DVD`, `CFG`, `ART`, `VMC`, `CHT`, `THM`, `LNG`, `APPS`, в `LNG\` — `lang_Russian.lng` и шрифт, `conf_opl.cfg` с `usb_mode=2`, `.yaoplm\manifest.json`.
-   - Окно «Загрузчик установлен»: «FreeMcBoot — настраивать ничего не нужно: стандартный конфиг запускает mass:/UPDT/OPL.ELF» и напоминание включить USB в настройках OPL.
-   - Карточка F: строка «Загрузчик» называет OPL 1.2.0 beta, его версию и `UPDT/OPL.ELF` (по версии внутри файла).
-3. **Консоль, FreeMcBoot.** Вставьте F: в PS2 и запустите пункт OPL в меню FMCB.
-   - Если на карте памяти уже есть `conf_opl.cfg`, OPL возьмёт настройки оттуда — это ожидаемо; тогда включите USB вручную («Авто») и сохраните.
-   - Без своих настроек на карте: USB включён сам, меню на русском (если язык не выбран в OPL — выберите его в настройках интерфейса).
-4. **«Не знаю» и чужой файл.** На ПК положите на F: любой другой ELF (например, wLaunchELF) как `APPS\OPNPS2LD.ELF`. Мастер → «Не знаю».
-   - План не выполняется: «В APPS/OPNPS2LD.ELF лежит другая программа (размер, SHA-256)…». Внизу «Заменить этот файл (резервная копия сохранится)».
-   - `UPDT/OPL.ELF` уже с этой сборкой: «уже лежит именно эта сборка».
-   - Отметьте «Заменить…» и подтвердите: прежний файл в `.yaoplm\backup\loader\<время>\APPS_OPNPS2LD.ELF`, байт в байт.
-   - Окно после установки: FreeMcBoot и PS2BBL, оба «настраивать ничего не нужно».
-5. **Консоль, PS2BBL (если есть).** Запуск PS2BBL с вставленной F: — стандартный конфиг запускает `mass:/APPS/OPNPS2LD.ELF`, то есть OPL.
-6. **Три копии.** Повторите шаг 4 ещё трижды, каждый раз подкладывая другой ELF в `APPS\OPNPS2LD.ELF`: в `.yaoplm\backup\loader\` остаются три последние копии этого пути, план показывает удаление самой старой.
-7. **MX4SIO (если будете проверять).** SD-карта в кардридере ПК, мастер → «MX4SIO»: способы «PS2BBL-MX4SIO или OSDMenu» (`APPS/OPL/OPNPS2LD.ELF` с `title.cfg`) и «OPL уже на карте памяти» (только папки); стартовых настроек нет. После установки — строки `LK_AUTO_E1 = massX:/APPS/OPL/OPNPS2LD.ELF` для `PS2BBL.INI` и `name_OSDSYS_ITEM_N` / `path1_OSDSYS_ITEM_N` для `OSDMENU.CNF`. Если добавите строку в конфиг на консоли — запускается ли OPL с MX4SIO.
-8. **CLI (по желанию).** `yaoplm loader install F:\ opl-beta --preset ps2bbl` печатает план, после «y» — строки запуска.
+1. **Wizard.** "Devices" → the F: card → "Install loader…".
+   - Where the device will work: "USB port". Launch method: "FreeMcBoot from the memory card" (`UPDT/OPL.ELF`). Build: "OPL 1.2.0 beta" marked "Recommended".
+   - Under the builds: version `v1.2.0-Beta-…`, date, size, AFL-3.0 licence, links to the release and commit, "What's new".
+   - Advanced mode: tick "OPL menu language: English" and "Starter settings".
+2. **Plan.** "Download and install" → the plan: "Create OPL folders", "OPL 1.2.0 beta in UPDT/OPL.ELF", language, "Remember the installed loader", starter settings with a warning about `conf_opl.cfg` on the card. Confirm.
+   - On F: `UPDT\OPL.ELF` appeared, the folders `CD`, `DVD`, `CFG`, `ART`, `VMC`, `CHT`, `THM`, `LNG`, `APPS`, in `LNG\` — `lang_English.lng` and the font, `conf_opl.cfg` with `usb_mode=2`, `.yaoplm\manifest.json`.
+   - The "Loader installed" dialog: "FreeMcBoot — nothing needs configuring: the standard config launches mass:/UPDT/OPL.ELF" and a reminder to enable USB in the OPL settings.
+   - The F: card's "Loader" row names OPL 1.2.0 beta, its version and `UPDT/OPL.ELF` (by the version inside the file).
+3. **Console, FreeMcBoot.** Insert F: into the PS2 and launch the OPL item in the FMCB menu.
+   - If the memory card already has a `conf_opl.cfg`, OPL will take the settings from there — this is expected; then enable USB manually ("Auto") and save.
+   - Without its own settings on the card: USB is enabled automatically, the menu is in English (if the language is not selected in OPL — select it in the interface settings).
+4. **"Don't know" and a foreign file.** On the PC put any other ELF on F: (for example wLaunchELF) as `APPS\OPNPS2LD.ELF`. The wizard → "Don't know".
+   - The plan is not executed: "APPS/OPNPS2LD.ELF contains another program (size, SHA-256)…". At the bottom "Replace this file (a backup will be kept)".
+   - `UPDT/OPL.ELF` already has this build: "this exact build is already there".
+   - Tick "Replace…" and confirm: the previous file is in `.yaoplm\backup\loader\<time>\APPS_OPNPS2LD.ELF`, byte for byte.
+   - The dialog after installation: FreeMcBoot and PS2BBL, both "nothing needs configuring".
+5. **Console, PS2BBL (if available).** Launch PS2BBL with F: inserted — the standard config launches `mass:/APPS/OPNPS2LD.ELF`, that is, OPL.
+6. **Three copies.** Repeat step 4 three more times, each time putting another ELF into `APPS\OPNPS2LD.ELF`: `.yaoplm\backup\loader\` keeps the last three copies of this path, and the plan shows the oldest being deleted.
+7. **MX4SIO (if you will check it).** SD card in the PC card reader, wizard → "MX4SIO": methods "PS2BBL-MX4SIO or OSDMenu" (`APPS/OPL/OPNPS2LD.ELF` with `title.cfg`) and "OPL already on the memory card" (folders only); no starter settings. After installation — the lines `LK_AUTO_E1 = massX:/APPS/OPL/OPNPS2LD.ELF` for `PS2BBL.INI` and `name_OSDSYS_ITEM_N` / `path1_OSDSYS_ITEM_N` for `OSDMENU.CNF`. If you add the line to the config on the console — does OPL launch from MX4SIO.
+8. **CLI (optional).** `yaoplm loader install F:\ opl-beta --preset ps2bbl` prints the plan, and after "y" — the launch lines.
 
-## Что прислать
+## What to report
 
-- По каждому шагу: «как ожидалось» или что было вместо этого (фото экрана PS2 или скриншот).
-- Запустился ли OPL из FMCB (шаг 3) и из PS2BBL (шаг 5), видит ли он USB без ручного включения.
-- Содержимое `F:\.yaoplm\manifest.json` после шага 4.
+- For each step: "as expected" or what happened instead (a photo of the PS2 screen or a screenshot).
+- Whether OPL launched from FMCB (step 3) and from PS2BBL (step 5), and whether it sees USB without manual enabling.
+- The contents of `F:\.yaoplm\manifest.json` after step 4.

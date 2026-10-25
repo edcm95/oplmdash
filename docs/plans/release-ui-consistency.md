@@ -1,82 +1,82 @@
-# Проверка согласованности интерфейса перед релизом
+# Pre-release interface consistency check
 
-Решение владельца продукта 2026-10-25. Перед каждым релизным тегом (`v0.N.0`) и после крупных изменений карточки носителя, шапки библиотеки или доктора носителя (DEV-2) интерфейс проходит одну сквозную проверку: всё, что программа говорит и предлагает об одном носителе и одной библиотеке, должно складываться в одну непротиворечивую историю. Отдельные PR проверяют свою функцию; противоречия между функциями видны только при таком проходе.
+The product owner's decision of 2026-10-25. Before every release tag (`v0.N.0`) and after major changes to the device card, the library header or the storage doctor (DEV-2), the interface goes through one end-to-end check: everything the program says and offers about one device and one library must add up to one consistent story. Individual PRs test their own feature; contradictions between features are visible only during such a walkthrough.
 
-## Почему это отдельная задача
+## Why this is a separate task
 
-Примеры из сессии 2026-10-25 (определение профиля, PR #38 и #40):
-- **Противоречивые сигналы на одной карточке.** Папка на системном диске одновременно получала «Не подходит для OPL», «На этом томе установлена операционная система» и вопрос «Какой OPL вы запускаете с этим носителем?». Каждая часть была верной по своей логике, вместе — бессмыслица. Исправлено в PR #40: вопрос скрыт, если доктор считает носитель непригодным. Корень проблемы (режим папки для SMB) не решён — см. «Открытые вопросы».
-- **Глобальная настройка, которая молча перебивает носитель.** Явный профиль в настройках отключал определение по файлам на всех носителях, а интерфейс показывал «по носителю» как умолчание. Убрано ADR-0040.
-- **Скрытый недостаток доступности.** Контраст `kbd` на странице настроек был ниже WCAG AA давно, но axe его не видел, пока элемент не попадал в видимую часть страницы. Строка профиля исчезла, карточка «Клавиатура» поднялась, E2E упал в CI.
-- **Фикстура не показывает часть интерфейса.** Библиотека для E2E лежит во временной папке на системном диске; доктор считает её непригодной, и вопрос о профиле в E2E на Windows не виден совсем, а на Linux CI — виден. Поведение пришлось проверять компонентными тестами, а E2E — подстраивать под вердикт.
+Examples from the 2026-10-25 session (profile detection, PR #38 and #40):
+- **Contradictory signals on one card.** A folder on the system disk simultaneously got "Not suitable for OPL", "An operating system is installed on this volume" and the question "Which OPL do you launch from this device?". Each part was correct by its own logic; together — nonsense. Fixed in PR #40: the question is hidden if the doctor considers the device unsuitable. The root of the problem (folder mode for SMB) is not solved — see "Open questions".
+- **A global setting that silently overrides the device.** An explicit profile in settings disabled file-based detection on all devices, while the interface showed "by device" as the default. Removed by ADR-0040.
+- **A hidden accessibility defect.** The contrast of `kbd` on the settings page had been below WCAG AA for a long time, but axe did not see it until the element entered the visible part of the page. The profile row disappeared, the "Keyboard" card moved up, and the E2E failed in CI.
+- **The fixture does not show part of the interface.** The E2E library lives in a temporary folder on the system disk; the doctor considers it unsuitable, and the profile question in E2E on Windows is not visible at all, while on Linux CI it is. The behaviour had to be checked with component tests, and the E2E adjusted to the verdict.
 
-## Когда
+## When
 
-1. Перед релизным тегом, после заморозки функций: полный проход по правилам и матрице ниже.
-2. После PR, которые меняют карточку носителя, шапку библиотеки, доктор носителя, подсказки «Что дальше» (UI-6), профили и вопросы о них, окна при подключении носителя: проход по затронутым строкам матрицы.
+1. Before a release tag, after feature freeze: a full walkthrough of the rules and matrix below.
+2. After PRs that change the device card, the library header, the storage doctor, the "What next" hints (UI-6), profiles and questions about them, or dialogs when a device is connected: a walkthrough of the affected matrix rows.
 
-## Правила (что должно выполняться)
+## Rules (what must hold)
 
-Каждое правило проверяется на всех строках матрицы. Нарушение — находка (см. «Порядок прохода»).
+Each rule is checked on all matrix rows. A violation is a finding (see "Walkthrough procedure").
 
-1. **Одна история на носитель.** Вердикт доктора, строка «Загрузчик», подсказка «Что дальше», вопросы, уведомления и кнопки не противоречат друг другу. Если носитель «Не подходит для OPL», ему не предлагают ничего, что имеет смысл только для пригодного: установку и обновление загрузчика, вопрос о версии OPL, «Скачать картинки» как следующий шаг.
-2. **Действие только там, где оно возможно.** Кнопки установки, обновления, замены и форматирования — по таблицам SPEC §5.10.1 и §5.11.2. Нет кнопок, которые ведут к отказу «нельзя на этом носителе».
-3. **Одна главная кнопка на состояние** (UI-6). Порядок важности, если подходят несколько: незавершённая запись (журнал) → непригодный носитель → подготовка или установка → вопрос о профиле → добавить игры → картинки → предупреждения игр. Вопрос о профиле и «Установить OPL…» не показываются одновременно как два первых шага.
-4. **Видно, почему.** Каждое значение, которое программа выбрала сама (профиль, тип диска, имя файла, ФС при подготовке), показывает причину («по …»). Выбор пользователя виден как выбор («выбран для этого носителя», «версия не известна»), обратим одним действием («Вернуть «Авто»») и не перебивается скрытой настройкой (ADR-0040).
-5. **Одно и то же везде.** Карточка носителя, шапка библиотеки, план записи, итог записи и `yaoplm device` называют один профиль с одной причиной. Кэши запросов учитывают выбор пользователя (ключи с `overrides`) и обновляются после записи: например, YAOPLM удаляет `games.bin` после изменений, и признак поколения OPL пропадает до следующего просмотра на консоли.
-6. **Уведомления без дублей и с верной важностью.** Одно уведомление не показывается дважды на одном экране. Уровень (ошибка, предупреждение, сведения) соответствует последствиям. Простой режим показывает только то, что объясняет вердикт и следующий шаг. Тексты двух уведомлений не спорят (например, «игры последней листала 1.2» рядом с выбранным пользователем 1.1.0 — уместно, но формулировка не должна звучать как ошибка программы).
-7. **Окна только по делу.** Модальные окна — подтверждение записи и явные действия пользователя. При подключении носителя окон нет, кроме «Доступно обновление» по SPEC §5.10.1 с «Не сейчас». Вопросы — строкой на карточке, не окном (ADR-0041).
-8. **Режим носителя.** Флешка или SD для PS2, папка, которую OPL читает по сети (SMB), корни сервера (Docker) — вердикты, вопросы и подсказки соответствуют тому, как OPL будет читать этот носитель. Сейчас это правило не выполняется для папок на диске компьютера (см. «Открытые вопросы»).
-9. **Тексты.** Глоссарий `docs/I18N.md`: один термин на одно понятие на всех экранах (носитель, флешка, папка, том). Паритет en/ru, типографика, нет ключей, которые больше нигде не используются. Фразы ядра переводятся при смене языка без перезагрузки.
-10. **Доступность.** axe без нарушений WCAG 2.2 AA на каждом экране и в каждом состоянии: оба режима, обе темы, открытые меню и диалоги, вопросы и предупреждения на карточках, прокрученные области. Сдвиг вёрстки открывает элементы, которые раньше axe не проверял. Навигация с клавиатуры: каждый вопрос и каждая кнопка достижимы Tab и работают Enter.
-11. **Вёрстка.** Длинные пути и названия, узкое окно (1024 px), перенос строки «Загрузчик» вместе с соседями в шапке библиотеки, выпадающие меню поверх предупреждений, тёмная тема, 3000+ игр.
-12. **Загрузка и ошибки.** Пока носитель не ответил, интерфейс не показывает выводов как окончательных (`ready=false`). Ошибка чтения не превращается в «признаков нет». Сканирование ждёт действующий профиль.
-13. **Скорость.** Определение загрузчика читает ELF целиком (до 64 МиБ) и распаковывает LZMA: список из пяти и более носителей, медленная флешка и сетевая папка не подвешивают экран; есть индикатор ожидания.
-14. **Десктоп, браузер, сервер.** Различия, которые есть по дизайну (форматирование только на десктопе, сервер показывает только свои корни, нет диалога выбора папки в браузере), объяснены подсказкой, а не отказом без причины.
+1. **One story per device.** The doctor's verdict, the "Loader" row, the "What next" hint, questions, notices and buttons do not contradict each other. If a device is "Not suitable for OPL", it is not offered anything that only makes sense for a suitable one: installing and updating a loader, the OPL version question, "Download pictures" as the next step.
+2. **An action only where it is possible.** Install, update, replace and format buttons — per SPEC §5.10.1 and §5.11.2 tables. No buttons that lead to a refusal "not allowed on this device".
+3. **One main button per state** (UI-6). Priority order when several fit: unfinished write (journal) → unsuitable device → setup or install → profile question → add games → pictures → game warnings. The profile question and "Install OPL…" are not shown simultaneously as the first two steps.
+4. **Why is visible.** Every value the program chose itself (profile, disc type, file name, FS during setup) shows the reason ("by …"). The user's choice is visible as a choice ("chosen for this device", "version unknown"), reversible with one action ("Return to "Auto"") and not overridden by a hidden setting (ADR-0040).
+5. **The same everywhere.** The device card, the library header, the write plan, the write result and `yaoplm device` name one profile with one reason. Request caches account for the user's choice (keys with `overrides`) and are refreshed after a write: for example, YAOPLM deletes `games.bin` after changes, and the OPL generation sign disappears until the next view on the console.
+6. **Notices without duplicates and with the right severity.** One notice is not shown twice on one screen. The level (error, warning, information) matches the consequences. Simple mode shows only what explains the verdict and the next step. The texts of two notices do not argue (for example, "the games were last listed by 1.2" next to a user-selected 1.1.0 — appropriate, but the wording must not sound like a program error).
+7. **Dialogs only when needed.** Modal dialogs — write confirmation and explicit user actions. When a device is connected there are no dialogs, except "Update available" per SPEC §5.10.1 with "Not now". Questions — as a row on the card, not as a dialog (ADR-0041).
+8. **Device mode.** A stick or SD card for PS2, a folder OPL reads over the network (SMB), server roots (Docker) — verdicts, questions and hints match how OPL will read this device. Currently this rule is not met for folders on the computer's disk (see "Open questions").
+9. **Texts.** The glossary `docs/I18N.md`: one term per concept on all screens (device, stick, folder, volume). Typography, no keys that are no longer used anywhere. Core phrases render from the English catalogue without a reload.
+10. **Accessibility.** axe without WCAG 2.2 AA violations on every screen and in every state: both modes, both themes, open menus and dialogs, questions and warnings on cards, scrolled areas. A layout shift opens elements that axe did not check before. Keyboard navigation: every question and every button is reachable with Tab and works with Enter.
+11. **Layout.** Long paths and titles, a narrow window (1024 px), the "Loader" row wrapping together with its neighbours in the library header, dropdown menus over warnings, the dark theme, 3000+ games.
+12. **Loading and errors.** Until a device has responded, the interface does not show conclusions as final (`ready=false`). A read error does not turn into "no signs". Scanning waits for an active profile.
+13. **Speed.** Loader detection reads the whole ELF (up to 64 MiB) and unpacks LZMA: a list of five or more devices, a slow stick and a network folder do not freeze the screen; there is a waiting indicator.
+14. **Desktop, browser, server.** Differences that exist by design (formatting only on the desktop, the server shows only its own roots, no folder selection dialog in the browser) are explained by a hint, not by a refusal without a reason.
 
-## Матрица состояний
+## State matrix
 
-Строки, которые нужно увидеть своими глазами (скриншоты en/ru, светлая и тёмная тема, простой и расширенный режим):
+Rows that need to be seen with your own eyes (English screenshots, light and dark theme, simple and advanced mode):
 
-| Носитель | Загрузчик и следы | Библиотека | Профиль |
+| Device | Loader and traces | Library | Profile |
 |---|---|---|---|
-| флешка FAT32 (тестовая F:) | нет | пустая | по умолчанию |
-| флешка FAT32 | нет, OPL на карте памяти | игры, `games.bin` 1.1.0 и 1.2 | по `games.bin`; вопрос, если `games.bin` нет |
-| флешка FAT32 | ELF 1.1.0, 1.2, YAOPL, RiptOPL, wOPL, NHDDL | игры | по хешу или версии в ELF |
-| флешка FAT32 | ELF + остатки другого форка | игры | по ELF + уведомление об остатках |
-| флешка FAT32 | повреждённый ELF | игры | по имени + уведомление |
-| флешка FAT32 | два ELF разных поколений | игры | ниже точного уровня + «несколько загрузчиков» |
-| флешка exFAT | нет и ELF 1.1.0 | игры с ZSO | не 1.1.0; конфликт с ELF 1.1.0 как проблема носителя |
-| флешка NTFS, GPT без разделов, сектор ≠ 512, только чтение | любые | любые | «Не подходит» + «Подготовить носитель…» без вопросов о версии |
-| SD в MX4SIO; SD эмулятора карты (MMCE) | как у флешки; служебные папки карты | игры | как у флешки; служебные папки не трогаются |
-| папка на системном диске | нет | игры | см. «Открытые вопросы» |
-| папка на несистемном диске (для SMB) | нет | игры | см. «Открытые вопросы» |
-| сетевая папка, смонтированная ОС | нет | игры | советы SMB |
-| корень сервера (Docker) | нет | игры | как у папки для SMB |
+| FAT32 stick (test F:) | none | empty | default |
+| FAT32 stick | none, OPL on the memory card | games, `games.bin` 1.1.0 and 1.2 | by `games.bin`; a question if there is no `games.bin` |
+| FAT32 stick | ELF 1.1.0, 1.2, YAOPL, RiptOPL, wOPL, NHDDL | games | by hash or the version in the ELF |
+| FAT32 stick | ELF + leftovers of another fork | games | by the ELF + a notice about the leftovers |
+| FAT32 stick | corrupted ELF | games | by name + a notice |
+| FAT32 stick | two ELF files of different generations | games | below the exact level + "several loaders" |
+| exFAT stick | none and ELF 1.1.0 | games with ZSO | not 1.1.0; a conflict with ELF 1.1.0 as a device problem |
+| NTFS stick, GPT without partitions, sector ≠ 512, read-only | any | any | "Not suitable" + "Prepare the device…" without version questions |
+| SD in MX4SIO; emulator SD card (MMCE) | as on a stick; the card's service folders | games | as on a stick; service folders are not touched |
+| folder on the system disk | none | games | see "Open questions" |
+| folder on a non-system disk (for SMB) | none | games | see "Open questions" |
+| network folder mounted by the OS | none | games | SMB advice |
+| server root (Docker) | none | games | as for an SMB folder |
 
-Для каждой строки дополнительно: выбор пользователя совпадает с файлами / противоречит им / «Не знаю»; незавершённая запись (журнал); после записи (удалён `games.bin`); смена языка на лету.
+For each row additionally: the user's choice matches the files / contradicts them / "Don't know"; an unfinished write (journal); after a write (`games.bin` deleted).
 
-## Фикстуры и тесты
+## Fixtures and tests
 
-- E2E-фикстура `make_library` лежит на системном диске, поэтому всё, что зависит от вердикта «пригоден», в E2E на Windows не видно. До прохода нужна фикстура «съёмный носитель»: например, тестовая переменная окружения сервера, которая помечает корень как внешний том FAT32, или отдельный образ FAT32. До тех пор состояния проверяются компонентными тестами (`LoaderProfileHint.test.tsx` — пример) и вручную на тестовой флешке.
-- Скриншоты каждой строки матрицы кладутся в ветку `pr-assets` (`release-<версия>/`), как у PR.
-- Известные нестабильные тесты (на 2026-10-25): `ConnectionStatus.test.tsx` иногда упирается во время под нагрузкой; CLI-тест `devices_and_device_doctor` однажды упал при полном прогоне с общей `target/`. Перед проходом их нужно прогнать несколько раз и починить, а не перезапускать до зелёного.
-- Реальные сборки загрузчиков (`scripts/loader-corpus.py`, тесты `loader_elfs` и `loader_corpus`) — перед проходом обновить выборку, чтобы карточки показывали актуальные версии.
+- The E2E fixture `make_library` lives on the system disk, so everything that depends on the "suitable" verdict is not visible in E2E on Windows. Before the walkthrough a "removable device" fixture is needed: for example, a server environment variable that marks the root as an external FAT32 volume, or a separate FAT32 image. Until then, states are checked by component tests (`LoaderProfileHint.test.tsx` — an example) and manually on the test stick.
+- Screenshots of each matrix row go to the `pr-assets` branch (`release-<version>/`), as for PRs.
+- Known flaky tests (as of 2026-10-25): `ConnectionStatus.test.tsx` sometimes times out under load; the CLI test `devices_and_device_doctor` once failed during a full run with a shared `target/`. Before the walkthrough they need to be run several times and fixed, not restarted until green.
+- Real loader builds (`scripts/loader-corpus.py`, the `loader_elfs` and `loader_corpus` tests) — refresh the sample before the walkthrough so the cards show current versions.
 
-## Порядок прохода
+## Walkthrough procedure
 
-1. Обновить клоны и выборку загрузчиков; собрать сервер и десктоп из релизной ветки.
-2. Подготовить носители матрицы на тестовой флешке F: (форматирование только через план), папку для SMB и корень сервера.
-3. Пройти строки матрицы в простом и расширенном режиме, en/ru, светлая и тёмная тема; снять скриншоты; прогнать axe на каждом экране.
-4. Каждое нарушение правила записать в `docs/plans/release-<версия>-ui-findings.md`: правило, строка матрицы, скриншот, предложение. Исправлять отдельными небольшими PR; решения, которые меняют SPEC, — через ADR.
-5. Повторить E2E, axe и проход по исправленным строкам.
-6. Обновить таблицы подсказок SPEC §5.11.2 и состояний SPEC §5.10.1, если поведение изменилось.
+1. Update the clones and the loader sample; build the server and desktop from the release branch.
+2. Prepare the matrix devices on test stick F: (formatting only through a plan), the SMB folder and the server root.
+3. Walk the matrix rows in simple and advanced mode, English, light and dark theme; take screenshots; run axe on every screen.
+4. Record each rule violation in `docs/plans/release-<version>-ui-findings.md`: rule, matrix row, screenshot, proposal. Fix with separate small PRs; decisions that change SPEC — through an ADR.
+5. Repeat E2E, axe and the walkthrough of the fixed rows.
+6. Update the SPEC §5.11.2 hint tables and SPEC §5.10.1 state tables if the behaviour changed.
 
-## Открытые вопросы (на 2026-10-25)
+## Open questions (as of 2026-10-25)
 
-1. **Режимы «носитель для PS2» и «папка для SMB»** (владелец продукта, 2026-10-25). Сейчас папка на диске компьютера оценивается как том для подключения к PS2: на системном диске — «Не подходит для OPL», хотя OPL может читать её по сети. Нужно решить:
-   - как определять режим: съёмный том — носитель для PS2; папка на внутреннем диске и сетевая папка — для SMB; корни сервера — для SMB; можно ли переключить вручную и где это запоминается (как выбор профиля, по ключу носителя);
-   - что меняется в докторе в режиме SMB: нет ошибки «системный диск» (запись по-прежнему только внутри выбранной папки); вместо советов ФС — правила SMB (SMBv1, имена до 159 байт, не больше 10 частей `ul`, нет лимита фрагментов и 4 ГиБ на NTFS);
-   - вопрос о профиле в режиме SMB нужен: версию OPL на консоли по папке не узнать, кроме `games.bin` и `conf_opl.cfg`;
-   - что показывать на карточке системного диска, открытого целиком.
-2. **Вопрос о профиле и путь новичка.** В SPEC §5.11.2 у состояния «папки OPL есть, загрузчика нет» есть кнопка «OPL на карте памяти». Вопрос о версии (ADR-0041) должен стать её продолжением, а не отдельным блоком рядом с подсказкой «Что дальше».
+1. **"Device for PS2" and "folder for SMB" modes** (product owner, 2026-10-25). Currently a folder on the computer's disk is evaluated as a volume for connecting to a PS2: on the system disk — "Not suitable for OPL", although OPL can read it over the network. Need to decide:
+   - how to determine the mode: a removable volume — a device for PS2; a folder on the internal disk and a network folder — for SMB; server roots — for SMB; whether it can be switched manually and where that is remembered (like the profile choice, by device key);
+   - what changes in the doctor in SMB mode: no "system disk" error (writing still only inside the selected folder); instead of FS advice — SMB rules (SMBv1, names up to 159 bytes, no more than 10 `ul` parts, no fragment limit and no 4 GiB limit on NTFS);
+   - the profile question is needed in SMB mode: the OPL version on the console cannot be learned from a folder, except from `games.bin` and `conf_opl.cfg`;
+   - what to show on the card of the system disk opened as a whole.
+2. **The profile question and the beginner's path.** In SPEC §5.11.2 the state "OPL folders exist, no loader" has an "OPL on the memory card" button. The version question (ADR-0041) should become its continuation, not a separate block next to the "What next" hint.

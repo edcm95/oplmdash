@@ -5,6 +5,7 @@ import { changeLanguage, isLanguage, languages } from "@/i18n";
 
 export function LanguageSwitch({ showNames = false }: { showNames?: boolean }) {
   const { t, i18n } = useTranslation();
+  if (languages.length < 2) return null;
 
   return (
     <ToggleGroup

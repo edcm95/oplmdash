@@ -1,58 +1,58 @@
-# M5, PR 2b — чек-лист: настройки игры и карты памяти (VMC)
+# M5, PR 2b — checklist: game settings and memory cards (VMC)
 
-Второй PR вехи M5, часть «b» (ветка `m5/cfg-vmc`: CFG-2, VMC-1, ADR-0036). Закрывает пункты 2 и 3 проверки M5 в ROADMAP: «режимы совместимости применяются» и «VMC работает: сейв создаётся и читается». Проверяет владелец на своей PS2. Отмечайте пункты по мере прохождения; замечания — отдельными маленькими PR. Общие правила тестовых данных — в [TESTING.md](../TESTING.md).
+The milestone M5's second PR, part "b" (branch `m5/cfg-vmc`: CFG-2, VMC-1, ADR-0036). Closes items 2 and 3 of the M5 check in ROADMAP: "compatibility modes are applied" and "VMC works: a save is created and read". The owner checks it on their PS2. Tick items as you go; report issues in separate small PRs. General test-data rules — in [TESTING.md](../TESTING.md).
 
-Рассчитано на флешку E: (FAT32, серийный номер тома `7E1CD2C5`), OPL 1.2.0 beta и OPL 1.1.0 с карты FreeMcBoot. Каждая запись на E: идёт через план; подтверждайте только их. Интернет не нужен.
+Intended for stick E: (FAT32, volume serial `7E1CD2C5`), OPL 1.2.0 beta and OPL 1.1.0 from the FreeMcBoot card. Every write to E: goes through a plan; confirm only those. The internet is not needed.
 
-**Осторожно с картой памяти.** В wLaunchELF, запущенном из OPL как игра, ничего не записывайте на `mc0:` и `mc1:`: неизвестно, подменяет ли OPL для него карту на VMC, и запись может попасть на настоящую карту с FreeMcBoot. Сейвы проверяются на вашей собственной игре (п. 15).
+**Be careful with the memory card.** In wLaunchELF launched from OPL as a game, write nothing to `mc0:` and `mc1:`: it is unknown whether OPL substitutes a VMC for the card for it, and a write could land on the real card with FreeMcBoot. Saves are checked on your own game (item 15).
 
-## Подготовка
+## Setup
 
-- [ ] 1. Запустить `pnpm tauri dev` из `apps/desktop` (или собранную из ветки программу). «Настройки»: профиль `OPL 1.2.0 beta`, «Простой режим» включён (так по умолчанию).
-- [ ] 2. Тестовые файлы уже лежат в `D:\yaoplm-testdata\out\m5-pr2b\` (их подготовил агент, всё сгенерировано, коммерческого ничего нет; рецепт — `README.txt` там же):
-  - `YAOP_000.08.CFG test.iso` и `YAOP_000.09.GSM test.iso` — wLaunchELF с ID `YAOP_000.08` и `YAOP_000.09`;
-  - `CFG\YAOP_000.08.cfg` — CFG «чужой» программы: ключи `Title`, `Genre`, `Description`, которые OPL сам не пишет, и `$Compatibility=1` (режим 1).
-- [ ] 3. «Носители» → E: → «Открыть библиотеку» → «Добавить игры» → оба образа → план → подтвердить. В библиотеке появились «CFG test» и «GSM test».
-- [ ] 4. Скопировать `CFG\YAOP_000.08.cfg` в `E:\CFG\` проводником (это «чужой» файл, который YAOPLM должен бережно править). В YAOPLM «Обновить»: на карточке «CFG test» в «Настройках игры» отмечен «Режим 1».
+- [ ] 1. Run `pnpm tauri dev` from `apps/desktop` (or the program built from the branch). "Settings": profile `OPL 1.2.0 beta`, "Simple mode" on (the default).
+- [ ] 2. The test files are already in `D:\yaoplm-testdata\out\m5-pr2b\` (prepared by the agent, everything generated, nothing commercial; the recipe is `README.txt` there):
+  - `YAOP_000.08.CFG test.iso` and `YAOP_000.09.GSM test.iso` — wLaunchELF with IDs `YAOP_000.08` and `YAOP_000.09`;
+  - `CFG\YAOP_000.08.cfg` — a "foreign" program's CFG: the keys `Title`, `Genre`, `Description`, which OPL does not write itself, and `$Compatibility=1` (mode 1).
+- [ ] 3. "Devices" → E: → "Open library" → "Add games" → both images → plan → confirm. "CFG test" and "GSM test" appeared in the library.
+- [ ] 4. Copy `CFG\YAOP_000.08.cfg` to `E:\CFG\` with the file manager (this is the "foreign" file that YAOPLM must edit carefully). In YAOPLM "Refresh": the "CFG test" card in "Game settings" shows "Mode 1" ticked.
 
-## Простой режим (на ПК)
+## Simple mode (on the PC)
 
-- [ ] 5. Карточка «CFG test» → «Настройки игры»: видны режимы 1–6 с пояснениями и «Слот VMC 1»; слота 2, GSM, читов и PADEMU нет. Снять «Режим 1», отметить «Режим 6: отключить IGR» → «Сохранить…». План: «Изменения в CFG: `$Compatibility: 1 → 32`, `$ConfigSource: (нет) → 1`», больше ничего. «Подтвердить и выполнить».
-- [ ] 6. «Слот VMC 1» → «Создать»: в списке «YAOP_000.08_0 (новая, 8 МиБ)». «Сохранить…» → план: «`$VMC_0: (нет) → YAOP_000.08_0`». Подтвердить. Уведомление «готово» без предупреждений. Если появится предупреждение «… лежит на носителе не одним куском» — запишите его текст: OPL такую карту не возьмёт.
-- [ ] 7. Проводник: `E:\VMC\YAOP_000.08_0.bin` ровно 8 388 608 байт. `E:\CFG\YAOP_000.08.cfg` в Блокноте: `Title`, `Genre`, `Description` на своих местах, ниже `$Compatibility=32`, `$ConfigSource=1`, `$VMC_0=YAOP_000.08_0`. В `E:\.yaoplm\backup\` лежат копии CFG до правок.
+- [ ] 5. The "CFG test" card → "Game settings": modes 1–6 with explanations and "VMC slot 1" are visible; slot 2, GSM, cheats and PADEMU are not. Untick "Mode 1", tick "Mode 6: disable IGR" → "Save…". The plan: "Changes in CFG: `$Compatibility: 1 → 32`, `$ConfigSource: (none) → 1`", nothing more. "Confirm and execute".
+- [ ] 6. "VMC slot 1" → "Create": the list shows "YAOP_000.08_0 (new, 8 MiB)". "Save…" → the plan: "`$VMC_0: (none) → YAOP_000.08_0`". Confirm. The "done" notice without warnings. If the warning "… lies on the device not in one piece" appears — write down its text: OPL will not take such a card.
+- [ ] 7. File manager: `E:\VMC\YAOP_000.08_0.bin` is exactly 8,388,608 bytes. `E:\CFG\YAOP_000.08.cfg` in Notepad: `Title`, `Genre`, `Description` in place, below `$Compatibility=32`, `$ConfigSource=1`, `$VMC_0=YAOP_000.08_0`. `E:\.yaoplm\backup\` holds copies of the CFG from before the edits.
 
-## Расширенный режим (на ПК)
+## Advanced mode (on the PC)
 
-- [ ] 8. «Настройки» → выключить «Простой режим». Карточка «GSM test» → «Настройки игры»:
-  - «GSM: видеорежим» → «Свои для этой игры» → «Включить свой видеорежим» → видеорежим, который ваш телевизор точно показывает, но не тот, в котором работает консоль: для PAL-консоли «PAL 60 Гц», для NTSC-консоли «NTSC, без чересстрочности»;
-  - «Читы» → «Свои для этой игры» → «Движок читов» → «Все коды».
-  «Сохранить…»: в плане `$GSMSource`, `$EnableGSM`, `$GSMVMode`, `$CheatsSource`, `$EnableCheat`, `$ConfigSource`. Подтвердить.
-- [ ] 9. «Слот VMC 2» у «GSM test» → «Создать…» → имя `generic_1`, размер 16 МиБ → «Взять новую карту» → «Сохранить…» → подтвердить. `E:\VMC\generic_1.bin` — 16 777 216 байт.
+- [ ] 8. "Settings" → turn off "Simple mode". The "GSM test" card → "Game settings":
+  - "GSM: video mode" → "Custom for this game" → "Enable custom video mode" → a video mode your TV definitely shows, but not the one the console runs in: for a PAL console "PAL 60 Hz", for an NTSC console "NTSC, non-interlaced";
+  - "Cheats" → "Custom for this game" → "Cheat engine" → "All codes".
+  "Save…": the plan has `$GSMSource`, `$EnableGSM`, `$GSMVMode`, `$CheatsSource`, `$EnableCheat`, `$ConfigSource`. Confirm.
+- [ ] 9. "VMC slot 2" on "GSM test" → "Create…" → name `generic_1`, size 16 MiB → "Take the new card" → "Save…" → confirm. `E:\VMC\generic_1.bin` — 16,777,216 bytes.
 
-## На консоли: OPL 1.2.0 beta, USB
+## On the console: OPL 1.2.0 beta, USB
 
-- [ ] 10. «CFG test» → Треугольник → меню игры → настройки совместимости: отмечен только режим 6, есть надпись «Customized Settings» (это `$ConfigSource=1`).
-- [ ] 11. Там же «Configure VMC»: «VMC Slot 1» — `YAOP_000.08_0`, состояние «VMC file exists», размер 8 Mb. **Ничего не меняйте и не нажимайте Create/Modify** (OPL пересоздал бы карту); выйти назад.
-- [ ] 12. Квадрат на «CFG test» → страница сведений: «YAOPLM CFG test» и жанр «Homebrew» (если тема их показывает) — ключи, которые YAOPLM не трогал, на месте.
-- [ ] 13. Крестик на «CFG test»: **нет** вопросов про VMC («Error accessing VMC…» или «VMC … is fragmented…»), wLaunchELF запускается. Нажать L1+L2+R1+R2+Start+Select: в OPL **не** возвращается (режим 6 выключил IGR). Перезапустить консоль кнопкой.
-- [ ] 14. Крестик на «GSM test»: перед запуском OPL пишет «No cheats found.» (читы включены, а файла читов нет — так и должно быть), затем wLaunchELF в другом видеорежиме (GSM). L1+L2+R1+R2+Start+Select возвращает в OPL. Если экран погас — перезапустить консоль кнопкой и написать, какой режим выбирали.
+- [ ] 10. "CFG test" → Triangle → game menu → compatibility settings: only mode 6 is ticked, the text "Customized Settings" is present (this is `$ConfigSource=1`).
+- [ ] 11. There "Configure VMC": "VMC Slot 1" — `YAOP_000.08_0`, state "VMC file exists", size 8 Mb. **Do not change anything and do not press Create/Modify** (OPL would recreate the card); go back.
+- [ ] 12. Square on "CFG test" → the details page: "YAOPLM CFG test" and the genre "Homebrew" (if the theme shows them) — the keys YAOPLM did not touch are in place.
+- [ ] 13. Cross on "CFG test": **no** VMC questions ("Error accessing VMC…" or "VMC … is fragmented…"), wLaunchELF launches. Press L1+L2+R1+R2+Start+Select: it does **not** return to OPL (mode 6 disabled IGR). Restart the console with the button.
+- [ ] 14. Cross on "GSM test": before launching OPL says "No cheats found." (cheats are enabled but there is no cheat file — this is expected), then wLaunchELF in a different video mode (GSM). L1+L2+R1+R2+Start+Select returns to OPL. If the screen goes black — restart the console with the button and write which mode you chose.
 
-## Сейв на своей игре
+## Save on your own game
 
-- [ ] 15. На ПК: карточка вашей GTA San Andreas (`SLUS_209.46`, части ul на E:) → «Слот VMC 1» → «Создать» → «Сохранить…» → подтвердить (карта `SLUS_209.46_0`, 8 МиБ). На консоли запустить игру: она видит карту памяти без предложения её отформатировать. Сохраниться, выйти, выключить консоль. Включить, запустить снова — загрузить сохранение. На ПК «Настройки игры» → в списке слота видно `SLUS_209.46_0 (8 МиБ)`; `yaoplm vmc ls E:\` (по желанию) показывает «1 saves».
+- [ ] 15. On the PC: your GTA San Andreas card (`SLUS_209.46`, ul parts on E:) → "VMC slot 1" → "Create" → "Save…" → confirm (card `SLUS_209.46_0`, 8 MiB). On the console launch the game: it sees the memory card without offering to format it. Save, exit, turn off the console. Turn on, launch again — load the save. On the PC "Game settings" → the slot list shows `SLUS_209.46_0 (8 MiB)`; `yaoplm vmc ls E:\` (optional) shows "1 saves".
 
 ## OPL 1.1.0
 
-- [ ] 16. «CFG test»: в настройках отмечен режим 6, в «Configure VMC» слот 1 — `YAOP_000.08_0`; запуск без вопросов про VMC.
+- [ ] 16. "CFG test": in the settings mode 6 is ticked, in "Configure VMC" slot 1 is `YAOP_000.08_0`; launching without VMC questions.
 
-## После OPL
+## After OPL
 
-- [ ] 17. В OPL 1.2.0 у «CFG test» отметить ещё режим 2 и сохранить («Save Changes»). На ПК «Обновить»: на карточке отмечены режимы 2 и 6; в CFG по-прежнему `Title`, `Genre`, `Description` (YAOPLM читает файл, который записал OPL).
+- [ ] 17. In OPL 1.2.0 on "CFG test" tick mode 2 as well and save ("Save Changes"). On the PC "Refresh": modes 2 and 6 are ticked on the card; the CFG still has `Title`, `Genre`, `Description` (YAOPLM reads the file that OPL wrote).
 
-## Уборка
+## Cleanup
 
-- [ ] 18. Удалить «CFG test» и «GSM test» вместе со связанными файлами (план удаления с отдельным подтверждением). Карты VMC YAOPLM не удаляет никогда (ADR-0020): `E:\VMC\YAOP_000.08_0.bin` и `E:\VMC\generic_1.bin` удалите проводником. Карту `SLUS_209.46_0` оставьте, если сейв нужен.
+- [ ] 18. Delete "CFG test" and "GSM test" together with related files (a deletion plan with a separate confirmation). YAOPLM never deletes VMC cards (ADR-0020): delete `E:\VMC\YAOP_000.08_0.bin` and `E:\VMC\generic_1.bin` with the file manager. Leave the `SLUS_209.46_0` card if the save is needed.
 
-## Что прислать
+## What to report
 
-Фото экрана OPL для пп. 10–14 и 16; результат п. 15 (загрузилось ли сохранение); снимки планов из пп. 5, 6 и 8; текст любого предупреждения или ошибки из плана, уведомления или OPL.
+A screen photo of OPL for items 10–14 and 16; the result of item 15 (did the save load); plan screenshots from items 5, 6 and 8; the text of any warning or error from the plan, a notice or OPL.

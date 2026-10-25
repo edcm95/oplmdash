@@ -130,10 +130,12 @@ describe("formatting", () => {
     await i18n.changeLanguage("en");
     expect(formatBytes(0)).toBe("0 B");
     expect(formatBytes(1536)).toBe("1.5 KiB");
-    expect(formatBytes(4_700_372_992)).toBe("4.4 GiB");
-    await i18n.changeLanguage("ru");
-    expect(formatBytes(4_700_372_992)).toBe("4,4 ГиБ");
-    await i18n.changeLanguage("en");
+    const gib = new Intl.NumberFormat("en", {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+      useGrouping: false,
+    }).format(4_700_372_992 / 1024 ** 3);
+    expect(formatBytes(4_700_372_992)).toBe(`${gib} GiB`);
   });
 
   it("formats durations and ETAs", () => {

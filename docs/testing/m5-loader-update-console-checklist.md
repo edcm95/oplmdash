@@ -1,37 +1,37 @@
-# M5: обновление и откат загрузчика — проверка (LDR-4)
+# M5: loader update and rollback — check (LDR-4)
 
-Что проверяем: карточка носителя знает, какая сборка OPL стоит на флешке, говорит «Актуально» или «Обновление: …» без обращения в сеть, окно «Доступно обновление» появляется один раз на носитель и сборку, «Не сейчас» запоминается, обновление заменяет только ELF, а «Вернуть …» возвращает прежнюю сборку. Подробности — ADR-0045, SPEC §5.10.1.
+What we check: the device card knows which OPL build is on the stick, says "Up to date" or "Update: …" without contacting the network, the "Update available" dialog appears once per device and build, "Not now" is remembered, an update replaces only the ELF, and "Return to …" restores the previous build. Details — ADR-0045, SPEC §5.10.1.
 
-Пишем только на тестовую флешку F: (на ней уже стоит OPL 1.2.0 beta `v1.2.0-Beta-2271-b3a2199`, установленный YAOPLM). Перед каждой записью программа показывает план; подтверждаете вы.
+We write only to test stick F: (it already has OPL 1.2.0 beta `v1.2.0-Beta-2271-b3a2199` installed by YAOPLM). Before every write the program shows a plan; you confirm.
 
-## Что нужно
+## What is needed
 
-- Флешка F: с OPL из прошлой проверки (`UPDT\OPL.ELF` и `.yaoplm\manifest.json`).
-- Сеть на ПК — только для шага 2.
-- Для шага 4 нужна более новая бета, чем 2271. Если upstream ещё не выпустил новую, этот шаг можно сделать с YAOPL или пропустить: тогда проверяется только «Актуально».
+- Stick F: with OPL from the previous check (`UPDT\OPL.ELF` and `.yaoplm\manifest.json`).
+- Network on the PC — only for step 2.
+- Step 4 needs a newer beta than 2271. If upstream has not released a new one yet, this step can be done with YAOPL or skipped: then only "Up to date" is checked.
 
-## Шаги
+## Steps
 
-1. **Карточка без сети.** «Носители» → карточка F:.
-   - Строка загрузчика: «OPL 1.2.0 beta v1.2.0-Beta-2271 (b3a2199) UPDT/OPL.ELF».
-   - Если программа уже читала релиз (после установки из прошлой проверки), рядом «Актуально» и «Последняя проверка: …». Без сети ничего не меняется.
-   - `yaoplm device F:\` → строка `Installed:  opl-beta v1.2.0-Beta-2271-b3a2199 at UPDT/OPL.ELF (installed by YAOPLM); …`.
-2. **Проверить обновления.** Кнопка на карточке. Если новой беты нет — «Это самая новая сборка своего канала». Если есть — сам открывается «Доступно обновление»:
-   - старая → новая версия, дата, размер, список изменений;
-   - ссылки «Страница релиза», «Коммит», «Что изменилось с вашей версии» (сравнение коммитов на GitHub).
-3. **«Не сейчас».** Закройте окно кнопкой «Не сейчас», обновите список кнопкой вверху справа и перезапустите программу: окно больше не появляется. На карточке остаются значок «Обновление: …» и кнопка «Обновить до …».
-4. **Обновление.** «Обновить до …» → «Обновить» → план «Обновление OPL 1.2.0 beta до …»: заменяется только `UPDT/OPL.ELF`, прежний файл уходит в `.yaoplm\backup\loader\<время>\UPDT_OPL.ELF`. Папки, `conf_opl.cfg` и игры не трогаются. Подтвердите.
-   - Карточка: новая версия и «Актуально», кнопка «Вернуть v1.2.0-Beta-2271».
-   - **Консоль:** OPL из меню FreeMcBoot запускается и показывает игры.
-5. **Откат.** «Вернуть v1.2.0-Beta-2271» → план «Откат загрузчика в UPDT/OPL.ELF» → подтвердите.
-   - На карточке снова 2271 и «Обновление: …»; окно само не открывается (эту пару уже предлагали).
-   - Кнопка теперь «Вернуть <новая версия>»: повторный откат возвращает обновление.
-   - **Консоль:** запускается снова 2271.
-6. **Настройка.** «Настройки» → «Загрузчики» → выключите «Предлагать обновления загрузчика автоматически»: окно не появляется ни на экране носителей, ни после проверки; кнопки на карточке остаются.
-7. **Замена без YAOPLM (по желанию).** Положите на F: вручную другой ELF как `UPDT\OPL.ELF` (например, YAOPL): карточка говорит «Заменён без YAOPLM» и показывает сборку по версии внутри файла. Верните прежний файл или выполните «Вернуть …».
+1. **Card without network.** "Devices" → the F: card.
+   - The loader row: "OPL 1.2.0 beta v1.2.0-Beta-2271 (b3a2199) UPDT/OPL.ELF".
+   - If the program has already read the release (after installation from the previous check), "Up to date" and "Last check: …" are next to it. Without a network nothing changes.
+   - `yaoplm device F:\` → the row `Installed:  opl-beta v1.2.0-Beta-2271-b3a2199 at UPDT/OPL.ELF (installed by YAOPLM); …`.
+2. **Check for updates.** The button on the card. If there is no new beta — "This is the newest build in its channel". If there is — "Update available" opens by itself:
+   - old → new version, date, size, changelog;
+   - links "Release page", "Commit", "What changed since your version" (a commit comparison on GitHub).
+3. **"Not now".** Close the dialog with "Not now", refresh the list with the button at the top right and restart the program: the dialog no longer appears. The card keeps the "Update: …" icon and the "Update to …" button.
+4. **Update.** "Update to …" → "Update" → the plan "Update OPL 1.2.0 beta to …": only `UPDT/OPL.ELF` is replaced, the previous file goes to `.yaoplm\backup\loader\<time>\UPDT_OPL.ELF`. Folders, `conf_opl.cfg` and games are not touched. Confirm.
+   - The card: the new version and "Up to date", the button "Return to v1.2.0-Beta-2271".
+   - **Console:** OPL from the FreeMcBoot menu launches and shows the games.
+5. **Rollback.** "Return to v1.2.0-Beta-2271" → the plan "Roll back the loader in UPDT/OPL.ELF" → confirm.
+   - The card shows 2271 again and "Update: …"; the dialog does not open by itself (this pair was already offered).
+   - The button is now "Return to <new version>": a repeated rollback restores the update.
+   - **Console:** 2271 launches again.
+6. **Setting.** "Settings" → "Loaders" → turn off "Offer loader updates automatically": the dialog does not appear either on the devices screen or after a check; the buttons on the card remain.
+7. **Replacement without YAOPLM (optional).** Put another ELF manually on F: as `UPDT\OPL.ELF` (for example YAOPL): the card says "Replaced without YAOPLM" and shows the build by the version inside the file. Restore the previous file or use "Return to …".
 
-## Что прислать
+## What to report
 
-- По каждому шагу: «как ожидалось» или что было вместо этого (скриншот).
-- Запустился ли OPL на консоли после обновления (шаг 4) и после отката (шаг 5).
-- Вывод `yaoplm device F:\` после шага 5.
+- For each step: "as expected" or what happened instead (a screenshot).
+- Whether OPL launched on the console after the update (step 4) and after the rollback (step 5).
+- The output of `yaoplm device F:\` after step 5.

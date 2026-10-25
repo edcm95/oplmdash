@@ -75,7 +75,7 @@ test("simple: the broken card in slot 1 is replaced by a formatted one", async (
 });
 
 // Screenshots for PR review (TESTING.md), after the tests above changed the games.
-for (const language of ["en", "ru"] as const) {
+for (const language of ["en"] as const) {
   for (const theme of ["light", "dark"] as const) {
     test(`settings screenshots ${language} ${theme}`, async ({ page, request }) => {
       await page.setViewportSize({ width: 1280, height: 900 });
@@ -102,7 +102,7 @@ for (const language of ["en", "ru"] as const) {
       await shot("cfg-advanced", settings);
       await page.setViewportSize({ width: 1280, height: 900 });
 
-      await settings.getByRole("checkbox", { name: /Mode 4|Режим 4/ }).check();
+      await settings.getByRole("checkbox", { name: /Mode 4/ }).check();
       await settings.getByTestId("cfg-vmc-create-0").click();
       const newCard = page.getByRole("dialog").last();
       await expect(newCard.getByTestId("cfg-vmc-new")).toBeVisible();
@@ -119,7 +119,7 @@ for (const language of ["en", "ru"] as const) {
 
       // A shift OPL's menu cannot set, and a card name OPL cannot take.
       const gsm = settings.getByTestId("cfg-gsm");
-      await gsm.getByRole("radio", { name: /game.s own|Свои для этой игры/ }).click();
+      await gsm.getByRole("radio", { name: /game.s own/ }).click();
       await gsm.getByRole("textbox").first().fill("999");
       await expect(settings.getByTestId("cfg-offset-range")).toBeVisible();
       await expect(settings.getByTestId("cfg-save")).toBeDisabled();

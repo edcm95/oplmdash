@@ -646,7 +646,7 @@ mod tests {
             Err(VmcNameError::BadChars(_))
         ));
         assert!(matches!(
-            validate_name("карта"),
+            validate_name("card"),
             Err(VmcNameError::BadChars(_))
         ));
         assert_eq!(validate_name(""), Err(VmcNameError::Empty));

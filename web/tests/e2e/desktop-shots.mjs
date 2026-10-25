@@ -82,6 +82,6 @@ if (mirror) {
 await page.goto(`${origin}/settings`, { waitUntil: "networkidle" });
 await page.waitForSelector('[data-testid="about"]');
 await shot("settings");
-const mode = await page.locator("dd").filter({ hasText: /Desktop app|Приложение/ }).first().textContent();
+const mode = await page.locator("dd").filter({ hasText: "Desktop app" }).first().textContent();
 console.log("mode:", mode);
 await browser.close();

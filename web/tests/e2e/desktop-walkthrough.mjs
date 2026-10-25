@@ -105,7 +105,7 @@ try {
       await page.evaluate(
         ([r, s]) => {
           localStorage.setItem("yaoplm.settings", JSON.stringify({ ...JSON.parse(localStorage.getItem("yaoplm.settings") ?? "{}"), root: r, simpleMode: s }));
-          localStorage.setItem("yaoplm.language", "ru");
+          localStorage.setItem("yaoplm.language", "en");
         },
         [root, simple],
       );

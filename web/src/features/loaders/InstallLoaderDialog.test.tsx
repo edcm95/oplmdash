@@ -206,26 +206,6 @@ describe("InstallLoaderDialog", () => {
     expect(core.of("LoaderBootHints")).toHaveLength(0);
   });
 
-  it("offers the interface language’s pack and the starter settings in the advanced mode", async () => {
-    await i18n.changeLanguage("ru");
-    storeSettings({ simpleMode: false });
-    const user = userEvent.setup();
-    const core = fakeCore({ languages: true });
-    show(core);
-    const dialog = await screen.findByTestId("loader-install-dialog");
-    await within(dialog).findByTestId("loader-offer");
-    expect(within(dialog).getByText("opl-beta по-русски")).toBeTruthy();
-    expect(within(dialog).getByTestId("loader-method-custom")).toBeTruthy();
-    const language = within(dialog).getByTestId("loader-language");
-    expect(language.getAttribute("data-state")).toBe("unchecked");
-    await user.click(language);
-    await user.click(within(dialog).getByTestId("loader-starter"));
-    await user.click(within(dialog).getByTestId("loader-install-start"));
-    await screen.findByTestId("plan-dialog");
-    expect(core.of("DownloadLoader")[0]?.languages).toBe(true);
-    expect(core.of("PlanInstallLoader")[0]).toMatchObject({ language: "Russian", starterSettings: true });
-  });
-
   it("asks for a path of the user’s own", async () => {
     storeSettings({ simpleMode: false });
     const user = userEvent.setup();

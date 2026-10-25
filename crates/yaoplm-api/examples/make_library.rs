@@ -1,5 +1,5 @@
 //! Builds the fixture library the Playwright tests run against
-//! (TESTING.md, "Проверка интерфейса агентом"):
+//! (TESTING.md, "Agent interface check"):
 //!
 //! ```text
 //! cargo run -p yaoplm-api --example make_library -- <folder> [--games N]

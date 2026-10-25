@@ -1,52 +1,52 @@
-# M4 — чек-лист проверки обложек на консоли
+# M4 — console cover checking checklist
 
-Веха M4 (PR #14, релиз v0.1.0). Проверяет владелец на своей PS2. Отмечайте пункты по мере прохождения; замечания — отдельными маленькими PR (ROADMAP, рабочий процесс). Общие правила тестовых данных — в [TESTING.md](../TESTING.md).
+Milestone M4 (PR #14, release v0.1.0). The owner checks it on their PS2. Tick items as you go; report issues in separate small PRs (ROADMAP, workflow). General test-data rules — in [TESTING.md](../TESTING.md).
 
-Рассчитано на флешку E: (FAT32, серийный номер тома `7E1CD2C5`), OPL 1.2.0 beta и OPL 1.1.0 с карты FreeMcBoot. Настоящих дампов не нужно: для обложек достаточно сгенерированных образов с настоящими ID, которые OPL показывает в списке (запускаться они не будут, это ожидаемо). Каждая запись на E: идёт через план; подтверждайте только их.
+Intended for stick E: (FAT32, volume serial `7E1CD2C5`), OPL 1.2.0 beta and OPL 1.1.0 from the FreeMcBoot card. Real dumps are not needed: for covers, generated images with real IDs are enough for OPL to show them in the list (they will not launch, which is expected). Every write to E: goes through a plan; confirm only those.
 
-## Подготовка
+## Setup
 
-- [ ] 1. Установить сборку из релиза `v0.1.0` (`YAOPLM_0.1.0_x64-setup.exe`) или запустить `pnpm tauri dev` из `apps/desktop`. В «Настройки → О программе» версия `0.1.0`, режим «Приложение».
-- [ ] 2. «Настройки → Библиотека»: профиль `OPL 1.2.0 beta`, имена `ID.Название.iso`. «Настройки → Обложки»: оба источника включены, поля «Зеркало» пустые (нужен интернет).
-- [ ] 3. Файлы для импорта лежат на D::
-  - `D:\yaoplm-testdata\out\m4-fixture\library\CD\SLUS_200.62.Retail Game.iso` (ID GTA III, обложка есть у xlenore);
-  - `D:\yaoplm-testdata\out\m4-fixture\library\DVD\SLUS_212.18.Dual Layer Quest.iso` (ID Tak, обложка есть);
-  - `D:\yaoplm-testdata\out\YAOP_000.01.wLaunchELF.iso` (загрузочный homebrew, обложки нет нигде).
-  - Для ручной замены: `D:\yaoplm-testdata\out\m4-fixture\mirror\custom-cover.jpg` (полосатая картинка, её легко отличить на экране).
-  - Если папки `m4-fixture` нет: `cargo run -p yaoplm-api --example make_library -- D:\yaoplm-testdata\out\m4-fixture`.
+- [ ] 1. Install the build from release `v0.1.0` (`YAOPLM_0.1.0_x64-setup.exe`) or run `pnpm tauri dev` from `apps/desktop`. In "Settings → About" the version is `0.1.0`, the mode is "Application".
+- [ ] 2. "Settings → Library": profile `OPL 1.2.0 beta`, names `ID.Title.iso`. "Settings → Covers": both sources enabled, the "Mirror" fields empty (the internet is needed).
+- [ ] 3. The files for import are on D::
+   - `D:\yaoplm-testdata\out\m4-fixture\library\CD\SLUS_200.62.Retail Game.iso` (GTA III ID, a cover exists at xlenore);
+   - `D:\yaoplm-testdata\out\m4-fixture\library\DVD\SLUS_212.18.Dual Layer Quest.iso` (Tak ID, a cover exists);
+   - `D:\yaoplm-testdata\out\YAOP_000.01.wLaunchELF.iso` (bootable homebrew, no cover anywhere).
+   - For manual replacement: `D:\yaoplm-testdata\out\m4-fixture\mirror\custom-cover.jpg` (a striped picture, easy to recognise on screen).
+   - If the `m4-fixture` folder is missing: `cargo run -p yaoplm-api --example make_library -- D:\yaoplm-testdata\out\m4-fixture`.
 
-## В YAOPLM на Windows
+## In YAOPLM on Windows
 
-- [ ] 4. «Устройства» → карточка E: (серийный номер `7E1CD2C5`) → «Открыть библиотеку». В шапке `E:\`.
-- [ ] 5. «Добавить игры» → «Добавить файлы…» → три образа из п. 3 → «Предпросмотр плана». Ожидается: `CD/SLUS_200.62.Retail Game.iso`, `DVD/SLUS_212.18.Dual Layer Quest.iso`, `CD/YAOP_000.01.wLaunchELF.iso`. «Добавить на носитель» → в «Заданиях» задание завершено, три операции `done`; в библиотеке три игры, счётчик «3 без обложки».
-- [ ] 6. Карточка «Retail Game»: в «Сведениях» строка «Название в базе: Grand Theft Auto III» со ссылкой «Переименовать так» (нажимать не обязательно). Внизу «Файлов обложек нет».
-- [ ] 7. Библиотека → «Скачать обложки». В диалоге «Только 3 игры без обложки», источники `1. xlenore/ps2-covers`, `2. libretro-thumbnails`. «Начать». В журнале: `SLUS_200.62 Retail Game: найдена в xlenore`, `SLUS_212.18 Dual Layer Quest: найдена в xlenore`, `YAOP_000.01 wLaunchELF: не найдена`. Затем диалог плана «Записать 2 обложки» с пропущенным `YAOP_000.01`. «Подтвердить и выполнить».
-- [ ] 8. В сетке две настоящие обложки (GTA III и Tak), у wLaunchELF заглушка; счётчик «1 без обложки». В проводнике `E:\ART\SLUS_200.62_COV.png` и `E:\ART\SLUS_212.18_COV.png`, оба 140×200 (свойства файла), около 50 КБ.
-- [ ] 9. «Задания»: у задания «Найти недостающие обложки» раскрыть «Журнал» — те же три строки; у задания записи две операции `done`.
+- [ ] 4. "Devices" → the E: card (serial `7E1CD2C5`) → "Open library". The header shows `E:\`.
+- [ ] 5. "Add games" → "Add files…" → the three images from item 3 → "Preview plan". Expected: `CD/SLUS_200.62.Retail Game.iso`, `DVD/SLUS_212.18.Dual Layer Quest.iso`, `CD/YAOP_000.01.wLaunchELF.iso`. "Add to device" → in "Jobs" the job is finished, three operations `done`; in the library three games, the counter "3 without cover".
+- [ ] 6. The "Retail Game" card: in "Details" the row "Title in the database: Grand Theft Auto III" with a "Rename to this" link (clicking is optional). At the bottom "No cover files".
+- [ ] 7. Library → "Download covers". The dialog says "Only 3 games without a cover", sources `1. xlenore/ps2-covers`, `2. libretro-thumbnails`. "Start". In the log: `SLUS_200.62 Retail Game: found in xlenore`, `SLUS_212.18 Dual Layer Quest: found in xlenore`, `YAOP_000.01 wLaunchELF: not found`. Then the plan dialog "Write 2 covers" with `YAOP_000.01` skipped. "Confirm and execute".
+- [ ] 8. In the grid two real covers (GTA III and Tak), wLaunchELF has a placeholder; the counter "1 without cover". In the file manager `E:\ART\SLUS_200.62_COV.png` and `E:\ART\SLUS_212.18_COV.png`, both 140×200 (file properties), about 50 KB.
+- [ ] 9. "Jobs": for the "Find missing covers" job expand "Log" — the same three lines; the write job has two operations `done`.
 
-## На консоли, OPL 1.2.0 beta
+## On the console, OPL 1.2.0 beta
 
-- [ ] 10. Флешка E: в USB, OPL 1.2.0 beta с карты FreeMcBoot, режим USB. В списке три игры: `Retail Game`, `Dual Layer Quest`, `wLaunchELF`. Запуск не проверяем, только список (wLaunchELF запускается, как в M2).
-- [ ] 11. Выделить `Retail Game`: в области обложки тема показывает коробку GTA III. `Dual Layer Quest` — обложку Tak. Значок диска (ICO) пустой: так и должно быть, ICO появится в v0.2.
-- [ ] 12. Выделить `wLaunchELF`: обложки нет, область пустая или с заглушкой темы, список не ломается, навигация работает.
+- [ ] 10. Stick E: in USB, OPL 1.2.0 beta from the FreeMcBoot card, USB mode. The list has three games: `Retail Game`, `Dual Layer Quest`, `wLaunchELF`. We do not check launching, only the list (wLaunchELF launches, as in M2).
+- [ ] 11. Select `Retail Game`: in the cover area the theme shows the GTA III box. `Dual Layer Quest` — the Tak cover. The disc icon (ICO) is empty: this is expected, ICO will appear in v0.2.
+- [ ] 12. Select `wLaunchELF`: no cover, the area is empty or has the theme's placeholder, the list does not break, navigation works.
 
-## На консоли, OPL 1.1.0
+## On the console, OPL 1.1.0
 
-- [ ] 13. Та же флешка в OPL 1.1.0: пункты 10–12 повторяются (PNG читают обе версии).
+- [ ] 13. The same stick in OPL 1.1.0: items 10–12 repeat (both versions read PNG).
 
-## Замена и удаление
+## Replacement and deletion
 
-- [ ] 14. В Windows: карточка «Retail Game» → «Заменить…» → «Из файла…» → `custom-cover.jpg`. План: `переименовать ART/SLUS_200.62_COV.png → .yaoplm/backup/<дата>/ART/…` и `записать ART/SLUS_200.62_COV.png`, заметка «текущая обложка переносится в папку резервных копий». Подтвердить. В карточке полосатая обложка; в `E:\.yaoplm\backup\<дата>\ART\` лежит прежний файл с GTA III.
-- [ ] 15. На консоли: перезапустить OPL (он держит текстуры в памяти, одного пересканирования может не хватить). У `Retail Game` полосатая обложка.
-- [ ] 16. В Windows: карточка `Retail Game` → «Удалить обложку» → план с удалением; кнопка недоступна, пока не отмечено «Я понимаю, что файлы будут удалены» → подтвердить. В `E:\ART` файла нет, копия в `.yaoplm\backup\…`. На консоли после перезапуска OPL у `Retail Game` снова заглушка.
-- [ ] 17. Возврат: карточка `Retail Game` → «Скачать обложку» → «Начать». В журнале `SLUS_200.62 Retail Game: из кэша (xlenore)` — без повторного обращения в сеть; план → подтвердить → GTA III на месте.
+- [ ] 14. In Windows: the "Retail Game" card → "Replace…" → "From file…" → `custom-cover.jpg`. The plan: `rename ART/SLUS_200.62_COV.png → .yaoplm/backup/<date>/ART/…` and `write ART/SLUS_200.62_COV.png`, with the note "the current cover is moved to the backup folder". Confirm. The card shows the striped cover; `E:\.yaoplm\backup\<date>\ART\` holds the previous GTA III file.
+- [ ] 15. On the console: restart OPL (it keeps textures in memory, one rescan may not be enough). `Retail Game` has the striped cover.
+- [ ] 16. In Windows: the `Retail Game` card → "Remove cover" → a plan with deletion; the button is unavailable until "I understand that files will be deleted" is ticked → confirm. The file is gone from `E:\ART`, a copy is in `.yaoplm\backup\…`. On the console after restarting OPL, `Retail Game` has the placeholder again.
+- [ ] 17. Restore: the `Retail Game` card → "Download cover" → "Start". The log says `SLUS_200.62 Retail Game: from cache (xlenore)` — without a repeated network request; plan → confirm → GTA III is back.
 
-## По желанию
+## Optional
 
-- [ ] 18. Вставка из буфера обмена: скопировать любую картинку в браузере («Копировать изображение»), в карточке «Заменить…» → «Вставить из буфера обмена» → план.
-- [ ] 19. Перетаскивание файла картинки на обложку в карточке → план.
-- [ ] 20. Профиль `RiptOPL` в настройках, «Скачать заново» для одной игры: файл в `E:\ART` становится 280×400.
+- [ ] 18. Paste from the clipboard: copy any picture in a browser ("Copy image"), in the card "Replace…" → "Paste from clipboard" → plan.
+- [ ] 19. Drag a picture file onto the cover in the card → plan.
+- [ ] 20. The `RiptOPL` profile in settings, "Download again" for one game: the file in `E:\ART` becomes 280×400.
 
-## Что прислать
+## What to report
 
-Фото экрана для п. 11, 12, 15 и 16 с указанием версии OPL (строка сборки в его меню «О программе»), вывод `dir E:\ART` и `dir /s E:\.yaoplm\backup` после п. 16, текст любой ошибки из диалога плана или задания. Если OPL покажет обложку не там или не той: размер файла и его свойства (ширина, высота, глубина цвета) в проводнике.
+A screen photo for items 11, 12, 15 and 16 with the OPL version (the build line in its "About" menu), the output of `dir E:\ART` and `dir /s E:\.yaoplm\backup` after item 16, and the text of any error from the plan or job dialog. If OPL shows the cover in the wrong place or the wrong one: the file size and its properties (width, height, colour depth) in the file manager.

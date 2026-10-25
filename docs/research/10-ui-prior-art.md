@@ -39,7 +39,7 @@ Short names:
 | Writes happen in the renderer and die with the window | Orbit, Tbx (Electron main process), POUM (Tauri command per file) | Jobs run in the core with a journal (ADR-0021); a reconnecting page gets the job list and log back from `ListJobs`/`GetJob` |
 | Drive list shows internal and system disks as targets | PIM, Nova (a folder picker only) | The storage doctor's verdict is on every card; system and non-external volumes are hidden by default on the desktop |
 | Free space checked with `TotalSize` instead of available space | Nova `IsoConverter.cs` (bug 8) | The core compares `write_bytes` with `free_bytes` when planning and again before the first write |
-| Dialog strings hard-coded in English | Nova, POUM, Orbit | every string goes through i18n (`en`, `ru`); warnings are translated by their stable `code` and keep the core's message with the specifics |
+| Dialog strings hard-coded in English | Nova, POUM, Orbit | every string goes through i18n (`en`); warnings are translated by their stable `code` and keep the core's message with the specifics |
 
 ## 3. Decisions made while building the UI
 

@@ -2,8 +2,6 @@ import { describe, expect, it } from "vitest";
 
 import en from "@/locales/en/translation.json";
 import enRaw from "@/locales/en/translation.json?raw";
-import ru from "@/locales/ru/translation.json";
-import ruRaw from "@/locales/ru/translation.json?raw";
 
 /**
  * The catalogues must agree (docs/I18N.md): the same keys in every
@@ -13,8 +11,8 @@ import ruRaw from "@/locales/ru/translation.json?raw";
  * reports and every value the UI turns into a key.
  */
 
-const catalogues = { en, ru } as const;
-const raws = { en: enRaw, ru: ruRaw } as const;
+const catalogues = { en } as const;
+const raws = { en: enRaw } as const;
 type Language = keyof typeof catalogues;
 const languages = Object.keys(catalogues) as Language[];
 
@@ -28,7 +26,7 @@ function flat(value: unknown, prefix = ""): Record<string, string> {
   return out;
 }
 
-const flats = { en: flat(en), ru: flat(ru) } as const;
+const flats = { en: flat(en) } as const;
 
 /** Keys without plural suffixes. */
 function baseKeys(entries: Record<string, string>): string[] {
@@ -222,17 +220,9 @@ describe("locales", () => {
         expect(text.includes("  "), where).toBe(false);
         expect(text.includes("..."), `${where} (use …)`).toBe(false);
         expect(/\s[,.;:!?](\s|$)/.test(text), `${where} (space before punctuation)`).toBe(false);
-        expect(text.includes('"'), `${where} (use «» in ru, “” in en)`).toBe(false);
+        expect(text.includes('"'), `${where} (use “” in en)`).toBe(false);
         expect(text.includes("'"), `${where} (use ’)`).toBe(false);
       }
-    }
-  });
-
-  it("translate what is English in the source", () => {
-    // A Russian string equal to the English one, with English words in it.
-    const english = /[a-z]{3,} [a-z]{2,}/;
-    for (const [key, text] of Object.entries(flats.ru)) {
-      if (text === flats.en[key] && english.test(text)) expect.fail(`ru: ${key} is not translated: ${text}`);
     }
   });
 

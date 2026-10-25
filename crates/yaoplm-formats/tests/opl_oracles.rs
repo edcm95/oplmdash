@@ -1,4 +1,4 @@
-//! Cross-checks against OPL's own code (TESTING.md, "Перекрёстные проверки").
+//! Cross-checks against OPL's own code (TESTING.md, "Cross-checks").
 //!
 //! OPL is AFL-3.0, so its source is never copied into this repository
 //! (ADR-0002). These tests read it from a checkout at run time:

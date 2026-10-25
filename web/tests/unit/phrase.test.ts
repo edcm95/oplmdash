@@ -14,26 +14,22 @@ describe("phrases from the core", () => {
     await i18n.changeLanguage("en");
   });
 
-  it("pick the plural form and match the core's English", async () => {
+  it("pick the plural form and match the core's English", () => {
     expect(phraseText(phrase("titles.importGames", { count: 1 }), "")).toBe("Import 1 game");
-    await i18n.changeLanguage("ru");
-    expect(phraseText(phrase("titles.importGames", { count: 1 }), "")).toBe("Добавить 1 игру");
-    expect(phraseText(phrase("titles.importGames", { count: 3 }), "")).toBe("Добавить 3 игры");
-    expect(phraseText(phrase("titles.importGames", { count: 25 }), "")).toBe("Добавить 25 игр");
+    expect(phraseText(phrase("titles.importGames", { count: 3 }), "")).toBe("Import 3 games");
+    expect(phraseText(phrase("titles.importGames", { count: 25 }), "")).toBe("Import 25 games");
   });
 
-  it("translate nested phrases and format sizes", async () => {
-    await i18n.changeLanguage("ru");
+  it("translate nested phrases and format sizes", () => {
     const undo = phrase("titles.recoveryUndo", {
       title: phrase("titles.deleteGame", { title: "Retail Game" }),
     });
-    expect(phraseText(undo, "")).toBe("Откатить: Удалить Retail Game");
+    expect(phraseText(undo, "")).toBe("Undo: Delete Retail Game");
     const space = phrase("errors.noSpace", { needed: 5 * 2 ** 30, free: 2 ** 20 });
-    expect(phraseText(space, "")).toBe("Не хватает места: нужно 5,0 ГиБ, свободно 1,0 МиБ");
+    expect(phraseText(space, "")).toBe("Not enough free space: 5.0 GiB needed, 1.0 MiB available");
   });
 
-  it("fall back to the core's English for a key the catalogue lacks", async () => {
-    await i18n.changeLanguage("ru");
+  it("fall back to the core's English for a key the catalogue lacks", () => {
     expect(phraseText(phrase("titles.fromANewerCore"), "Do something new")).toBe("Do something new");
     const nested = phrase("errors.planBlocked", { reason: phrase("notices.fromANewerCore") });
     expect(phraseText(nested, "The plan cannot run. Something new")).toBe(
@@ -42,14 +38,13 @@ describe("phrases from the core", () => {
     expect(phraseText(null, "Import 2 games")).toBe("Import 2 games");
   });
 
-  it("show API errors in the current language", async () => {
-    await i18n.changeLanguage("ru");
+  it("show API errors in English", () => {
     const error = new RpcError({
       code: "NotFound",
       message: "Plan 7 expired or already ran",
       phrase: phrase("errors.planExpired", { id: "7" }),
     });
-    expect(errorText(error)).toBe("План 7 устарел или уже выполнен");
+    expect(errorText(error)).toBe("Plan 7 expired or already ran");
     expect(errorText({ code: "Internal", message: "boom" })).toBe("boom");
     expect(errorText(new Error("plain"))).toBe("plain");
   });

@@ -35,15 +35,14 @@ test("deep links are served by the SPA", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1, name: "Jobs" })).toBeVisible();
 });
 
-test("language and theme persist across reloads", async ({ page }) => {
+test("theme persists across reloads", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("radio", { name: "Русский" }).click();
-  await expect(page.getByRole("heading", { level: 1, name: "Библиотека" })).toBeVisible();
-  await page.getByRole("button", { name: "Включить тёмную тему" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Library" })).toBeVisible();
+  await page.getByRole("button", { name: "Switch to dark theme" }).click();
   await expect(page.locator("html")).toHaveClass(/\bdark\b/);
 
   await page.reload();
-  await expect(page.getByRole("heading", { level: 1, name: "Библиотека" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Library" })).toBeVisible();
   await expect(page.locator("html")).toHaveClass(/\bdark\b/);
-  await expect(page.locator("html")).toHaveAttribute("lang", "ru");
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
 });

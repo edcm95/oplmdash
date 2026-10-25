@@ -842,8 +842,7 @@
     "offerLoaderUpdatesHint": "When a device’s loader has a newer build of its channel, “Update available” opens once for that device and build. YAOPLM learns of new builds only on “Check for updates”."
   },
   "languages": {
-    "en": "English",
-    "ru": "Русский"
+    "en": "English"
   },
   "dump": {
     "status": {

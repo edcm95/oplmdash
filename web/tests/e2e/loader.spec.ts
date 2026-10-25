@@ -50,12 +50,12 @@ test("a loader's settings file on the device decides the profile", async ({ page
   mkdirSync(app, { recursive: true });
   writeFileSync(path.join(app, "settings_riptopl.cfg"), "enable_usb=1\r\n");
   try {
-    await openLibrary(page, request, { language: "ru" });
+    await openLibrary(page, request, { language: "en" });
     await page.goto("/library");
     const header = page.getByTestId("loader-profile");
     await expect(header.getByTestId("loader-profile-name")).toHaveText("RiptOPL");
     await expect(header.getByTestId("loader-profile-reason")).toHaveText(
-      "— APPS/APP_RIPTOPL/settings_riptopl.cfg, который пишет только RiptOPL",
+      "— APPS/APP_RIPTOPL/settings_riptopl.cfg, which only RiptOPL writes",
     );
   } finally {
     // Other specs expect a library without a loader.
@@ -70,16 +70,16 @@ test("there is no global profile: an old saved one is ignored (ADR-0040)", async
     const kept = typeof current === "object" && current !== null ? current : {};
     localStorage.setItem("yaoplm.settings", JSON.stringify({ ...kept, loaderProfile: "RiptOpl" }));
   });
-  await openLibrary(page, request, { language: "ru" });
+  await openLibrary(page, request, { language: "en" });
   await page.goto("/settings");
-  await expect(page.getByText("Профиль загрузчика определяется по файлам каждого носителя")).toBeVisible();
-  await expect(page.getByRole("combobox", { name: "Профиль загрузчика" })).toHaveCount(0);
+  await expect(page.getByText("The loader profile is read from each device’s files")).toBeVisible();
+  await expect(page.getByRole("combobox", { name: "Loader profile" })).toHaveCount(0);
   await page.goto("/library");
   const header = page.getByTestId("loader-profile");
   await expect(header).toHaveAttribute("data-source", "detected");
   await expect(header.getByTestId("loader-profile-name")).toHaveText("OPL 1.2.0 beta");
   await header.getByTestId("loader-profile-change").click();
-  await expect(page.getByTestId("loader-profile-auto")).toHaveText("Авто (по носителю)");
+  await expect(page.getByTestId("loader-profile-auto")).toHaveText("Auto (by device)");
 });
 
 test("the question follows the doctor's verdict (ADR-0041)", async ({ page, request }) => {
@@ -103,7 +103,7 @@ test("the question follows the doctor's verdict (ADR-0041)", async ({ page, requ
   await page.getByTestId("loader-profile-auto").click();
 });
 
-for (const language of ["en", "ru"] as const) {
+for (const language of ["en"] as const) {
   for (const theme of ["light", "dark"] as const) {
     test(`loader profile screenshots ${language} ${theme}`, async ({ page, request }) => {
       await page.setViewportSize({ width: 1280, height: 800 });

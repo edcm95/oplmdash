@@ -174,7 +174,7 @@ test("games are added with their covers and checked as they are written", async 
 });
 
 // Screenshots for the PR (TESTING.md), saved with the others.
-for (const language of ["en", "ru"] as const) {
+for (const language of ["en"] as const) {
   for (const theme of ["light", "dark"] as const) {
     test(`dump screenshots ${language} ${theme}`, async ({ page, request }) => {
       await page.setViewportSize({ width: 1280, height: 800 });

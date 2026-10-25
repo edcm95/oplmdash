@@ -144,7 +144,7 @@ mod tests {
     #[test]
     fn portability() {
         assert!(is_portable(b"Grand Theft Auto III"));
-        assert!(!is_portable("Пример".as_bytes()));
+        assert!(!is_portable("Exämple".as_bytes()));
         // Bytes past the NUL or the 33-byte window are never hashed.
         assert!(is_portable(b"OK\0\xff"));
         let mut tail = [b'A'; 34];

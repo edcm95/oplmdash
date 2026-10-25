@@ -160,8 +160,8 @@ async function layoutProblems(page: Page): Promise<string[]> {
 for (const simple of [true, false]) {
   const mode = simple ? "simple" : "advanced";
   for (const [index, [width, height]] of sizes.entries()) {
-    // Alternating language and theme covers both of each across the sizes.
-    const language = index % 2 === 0 ? "en" : "ru";
+    // Alternating theme covers both themes across the sizes.
+    const language = "en";
     const theme = index % 2 === 0 ? "light" : "dark";
     test(`every screen fits at ${width}×${height}, ${mode} mode, ${language} ${theme}`, async ({ page, request }) => {
       const errors: string[] = [];
@@ -202,7 +202,7 @@ for (const simple of [true, false]) {
       await page.getByTestId("game-grid").getByRole("listitem").first().click();
       await expect(page.getByTestId("game-title")).toBeVisible();
       await check("game card");
-      const rename = page.getByRole("group", { name: language === "en" ? "Actions" : "Действия" }).getByRole("button").first();
+      const rename = page.getByRole("group", { name: "Actions" }).getByRole("button").first();
       await rename.click();
       await expect(page.getByRole("dialog")).toBeVisible();
       await check("rename dialog");
@@ -248,7 +248,7 @@ for (const simple of [true, false]) {
   for (const theme of ["light", "dark"] as const) {
     test(`no WCAG 2.2 AA violations axe can find, ${simple ? "simple" : "advanced"} mode, ${theme}`, async ({ page, request }) => {
       await page.setViewportSize({ width: 1280, height: 800 });
-      await openLibrary(page, request, { language: theme === "light" ? "en" : "ru", theme, simple });
+      await openLibrary(page, request, { language: "en", theme, simple });
       const found: string[] = [];
 
       await page.goto("/devices");

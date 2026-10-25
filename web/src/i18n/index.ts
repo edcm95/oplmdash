@@ -3,9 +3,8 @@ import { initReactI18next } from "react-i18next";
 
 import { readStorage, writeStorage } from "@/lib/storage";
 import en from "@/locales/en/translation.json";
-import ru from "@/locales/ru/translation.json";
 
-export const languages = ["en", "ru"] as const;
+export const languages = ["en"] as const;
 export type Language = (typeof languages)[number];
 
 const STORAGE_KEY = "yaoplm.language";
@@ -17,7 +16,7 @@ export function isLanguage(value: unknown): value is Language {
 export function detectLanguage(): Language {
   const saved = readStorage(STORAGE_KEY);
   if (isLanguage(saved)) return saved;
-  return navigator.language.toLowerCase().startsWith("ru") ? "ru" : "en";
+  return "en";
 }
 
 export function changeLanguage(language: Language): void {
@@ -30,7 +29,7 @@ i18n.on("languageChanged", (language) => {
 });
 
 void i18n.use(initReactI18next).init({
-  resources: { en: { translation: en }, ru: { translation: ru } },
+  resources: { en: { translation: en } },
   lng: detectLanguage(),
   fallbackLng: "en",
   interpolation: { escapeValue: false },

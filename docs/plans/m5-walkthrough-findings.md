@@ -1,63 +1,62 @@
-# План: находки обхода интерфейса на настоящей флешке (M5)
+# Plan: interface walkthrough findings on a real stick (M5)
 
-Источник — обход интерфейса для PR «доводка интерфейса и простой режим» (UI-4, UI-5, `docs/plans/m5-ui-simple-mode.md`), 2026-10-24. Интерфейсные находки исправлены в том PR; здесь — то, что относится к ядру или требует отдельной работы. Решение владельца продукта: заняться в отдельной сессии, в конце M5.
+Source — the interface walkthrough for the PR "interface polish and simple mode" (UI-4, UI-5, `docs/plans/m5-ui-simple-mode.md`), 2026-10-24. Interface findings were fixed in that PR; this file covers what relates to the core or needs separate work. The product owner's decision: handle it in a separate session at the end of M5.
 
-## Как искали
+## How we looked
 
-- Тестовая коллекция `D:\yaoplm-testdata\out\ui-collection`: 20 файлов, образы с загрузчиком wLaunchELF внутри (homebrew, AFL-2.0) и настоящими ID игр, собраны `make_boot_iso --id` и `pack`. Есть ISO (один на 700 МиБ), BIN/CUE, CHD, zip, 7z, zip с двумя играми, битый zip, случайные байты с расширением `.iso` и текстовый файл. Программа видит их как настоящие игры: названия из базы, картинки из сети, проверка по Redump (вердикт — «плохой дамп», хеши не совпадают).
-- `yaoplm-server` с корнями `E:\` (тестовая флешка владельца, FAT32, серийный номер 7E1CD2C5) и папкой коллекции; браузер — Playwright. Простой режим, русский язык, картинки — из сети, без зеркал.
-- Добавлено 15 игр одним планом с поиском картинок: 60 картинок найдено за 56 с, запись 711 МиБ — 3 мин 7 с.
+- Test collection `D:\yaoplm-testdata\out\ui-collection`: 20 files, images with wLaunchELF inside (homebrew, AFL-2.0) and real game IDs, built with `make_boot_iso --id` and `pack`. There is an ISO (one at 700 MiB), BIN/CUE, CHD, zip, 7z, a zip with two games, a broken zip, random bytes with an `.iso` extension and a text file. The program sees them as real games: titles from the database, pictures from the network, Redump verification (the verdict — "bad dump", hashes do not match).
+- `yaoplm-server` with the roots `E:\` (the owner's test stick, FAT32, serial 7E1CD2C5) and the collection folder; browser — Playwright. Simple mode, English, pictures — from the network, without mirrors.
+- 15 games added in one plan with picture search: 60 pictures found in 56 s, writing 711 MiB — 3 min 7 s.
 
-## Находки
+## Findings
 
-### 1. Тип диска угадывается по размеру образа
+### 1. Disc type is guessed from the image size
 
-- **Что видно.** Образ Gran Turismo 4 (`SCUS_906.82`, 700 МиБ) план кладёт в `CD/`, хотя это DVD-игра. На настоящем дампе GT4 (4 ГиБ) так не будет, но небольшие DVD-игры (есть на 300–600 МБ) попадут в `CD/`, и OPL будет читать их в режиме CD.
-- **Что делать.** Сначала prior art (правило 6): как решают OPL Manager, OPL PC Tools, ulmake и hdl-dump. Затем брать тип диска из DAT Redump (у CD-игр `.cue` и `.bin`, у DVD — `.iso`) или из базы названий, если ID там есть; размер — только запасной вариант. В плане показывать, откуда взят тип; переопределение CD/DVD в плане уже есть. Тест: маленький образ с ID известной DVD-игры ложится в `DVD/`.
+- **What is visible.** The plan places the Gran Turismo 4 image (`SCUS_906.82`, 700 MiB) into `CD/`, although it is a DVD game. With a real GT4 dump (4 GiB) this will not happen, but small DVD games (there are 300–600 MB ones) will land in `CD/`, and OPL will read them in CD mode.
+- **What to do.** First prior art (rule 6): how OPL Manager, OPL PC Tools, ulmake and hdl-dump solve it. Then take the disc type from the Redump DAT (CD games have `.cue` and `.bin`, DVD have `.iso`) or from the title database if the ID is there; size — only a fallback. Show in the plan where the type came from; the CD/DVD override in the plan already exists. Test: a small image with a known DVD game's ID lands in `DVD/`.
 
-### 2. «Осталось 25 мин» у записи, которая заняла 3 минуты
+### 2. "25 min remaining" for a write that took 3 minutes
 
-- **Что видно.** В начале записи плавающая панель показала 478 КиБ/с и «осталось 25 мин 18 с»: первые операции — маленькие картинки, у которых на FAT32 велика доля накладных расходов на файл. Задание закончилось через 3 минуты.
-- **Что делать.** Не показывать оценку, пока не записано достаточно (по времени или байтам), сглаживать скорость, учитывать число файлов отдельно от байтов. Проверить на настоящей флешке с образом на 1–4 ГиБ.
+- **What is visible.** At the start of the write the floating panel showed 478 KiB/s and "25 min 18 s remaining": the first operations are small pictures, where FAT32 has a large per-file overhead. The job finished 3 minutes later.
+- **What to do.** Do not show an estimate until enough has been written (by time or bytes), smooth the speed, account for the file count separately from bytes. Check on a real stick with a 1–4 GiB image.
 
-### 3. Технический путь в причине пропуска
+### 3. A technical path in a skip reason
 
-- **Что видно.** Битый zip в плане: «Не читается: `\\?\D:\yaoplm-testdata\...\Broken download.zip`: zip: invalid Zip archive: Could not find EOCD». В тексте для пользователя — префикс `\\?\` и сообщение библиотеки на английском.
-- **Что делать.** Убирать префикс `\\?\` везде, где путь попадает во фразу (`display_path` в `yaoplm-api`); для частых причин (архив не докачан, повреждён, зашифрован) — своя фраза в `reasons.*`, техническая подробность — после неё (I18N, правило 8).
+- **What is visible.** A broken zip in the plan: "Cannot read: `\\?\D:\yaoplm-testdata\...\Broken download.zip`: zip: invalid Zip archive: Could not find EOCD". The user-facing text contains the `\\?\` prefix and the library's message in English.
+- **What to do.** Remove the `\\?\` prefix everywhere a path reaches a phrase (`display_path` in `yaoplm-api`); for common reasons (archive not fully downloaded, corrupted, encrypted) — a dedicated phrase in `reasons.*`, with the technical detail after it (I18N, rule 8).
 
-### 4. Итог поиска картинок не пересчитывается, когда игру убрали
+### 4. The picture search result is not recomputed when a game is removed
 
-- **Что видно.** После того как из списка источников убрали одну игру, панель «Картинки» под планом показывает те же «Найдено картинок: 60, не найдено: 4»: числа относятся к поиску, а не к плану. Записывается при этом верно, только картинки оставшихся игр.
-- **Что делать.** Считать итог по играм текущего плана (найденные и ненайденные картинки по их ID) или подписать, что это итог поиска. Мелочь интерфейса, но правка в `CoverSearchPanel` и в ответе `FetchArt` (счёт по ID).
+- **What is visible.** After removing one game from the source list, the "Pictures" panel under the plan shows the same "Pictures found: 60, not found: 4": the numbers refer to the search, not to the plan. What is written, however, is correct — only the pictures of the remaining games.
+- **What to do.** Compute the result for the games of the current plan (found and not-found pictures by their IDs) or label it as the search result. A small interface fix, but it changes `CoverSearchPanel` and the `FetchArt` response (counting by ID).
 
-### 5. Сетка один раз оказалась прокручена
+### 5. The grid was scrolled once
 
-- **Что видно.** Сразу после записи 15 игр сетка библиотеки показала второй ряд сверху, первый был срезан. После перезагрузки и пересканирования — нет; воспроизвести не удалось.
-- **Что делать.** Следить при следующих обходах; если повторится — записать шаги и чинить сохранение позиции в `GameGrid` (`firstShown`, `virtualizer.measure()`).
+- **What is visible.** Right after writing 15 games the library grid showed the second row at the top and the first was cut off. After a reload and rescan — no; could not reproduce.
+- **What to do.** Watch during the next walkthroughs; if it repeats — record the steps and fix position saving in `GameGrid` (`firstShown`, `virtualizer.measure()`).
 
-## Не находки
+## Non-findings
 
-- Вердикт «плохой дамп» у всех образов коллекции ожидаем: внутри homebrew, а не игры.
-- Отдельная задача — источники картинок для всех типов OPL (сессия `art-sources`, свой PR и ADR).
+- The "bad dump" verdict for all collection images is expected: they contain homebrew, not games.
+- A separate task — picture sources for all OPL types (the `art-sources` session, its own PR and ADR).
 
-## Обход настольного приложения (2026-10-24, вторая часть)
+## Desktop app walkthrough (2026-10-24, second part)
 
-Debug-сборка `yaoplm-desktop.exe` со своим профилем WebView2, тестовая библиотека и зеркала в `D:\yaoplm-testdata\out\desktop-walkthrough` (`make_library`, homebrew-образы из `D:\yaoplm-testdata\out\m5-pr2b`), `YAOPLM_OFFLINE=1`. Пройдены оба режима, обе темы и оба языка: библиотека, карточка игры, переименование по базе, обложка из файла, перенос CD↔DVD, настройки игры в простом и расширенном режиме (режимы RiptOPL, слоты VMC, GSM), добавление папки с ISO, BIN/CUE и дубликатами, импорт DAT Redump, зеркала источников, скачивание и импорт картинок, проверка дампов, конвертация в ZSO, задания, носители, удаление.
+Debug build of `yaoplm-desktop.exe` with its own WebView2 profile, the test library and mirrors in `D:\yaoplm-testdata\out\desktop-walkthrough` (`make_library`, homebrew images from `D:\yaoplm-testdata\out\m5-pr2b`), `YAOPLM_OFFLINE=1`. Both modes, both themes and English were walked: library, game card, rename from the database, cover from a file, CD↔DVD move, game settings in simple and advanced mode (RiptOPL modes, VMC slots, GSM), adding a folder with ISO, BIN/CUE and duplicates, Redump DAT import, source mirrors, downloading and importing pictures, dump verification, conversion to ZSO, jobs, devices, deletion.
 
-Исправлено в PR `m5/desktop-walkthrough-fixes`:
+Fixed in the PR `m5/desktop-walkthrough-fixes`:
 
-- поиск в библиотеке терял буквы при быстром наборе (`BrowserRouter` обновлял `?q=` в переходе React);
-- сдвиги GSM принимали любое число, хотя меню OPL даёт от −100 до 100 (`src/dialogs.c`), а «−» в поле набрать было нельзя;
-- в плане добавления без сети у каждой игры был абзац из адресов и английских сообщений; теперь — названия источников, полный текст — в журнале задания;
-- ошибка и итог Redump, ошибка очистки кэша не переводились при смене языка;
-- меню «Ещё» и меню слота картинки переносили пункты на две строки; список карт VMC обрезал подпись;
-- неверное имя новой карты VMC блокировало кнопку без объяснения.
+- library search lost letters during fast typing (`BrowserRouter` updated `?q=` in a React transition);
+- GSM offsets accepted any number, although the OPL menu offers −100 to 100 (`src/dialogs.c`), and "−" could not be typed into the field;
+- in the add plan without a network every game had a paragraph of addresses and English messages; now — source names, with the full text in the job log;
+- the "More" menu and the picture slot menu wrapped items onto two lines; the VMC card list cut off the label;
+- an invalid name for a new VMC card blocked the button without explanation.
 
-Не исправлено:
+Not fixed:
 
-6. **Тип диска по другой игре с тем же ID.** Дополнение к п. 1: «Tak - The Great Juju Challenge» (`SLUS_212.18`, образ без UDF и CD-XA) план кладёт в `CD/`, хотя на носителе уже есть игра с этим ID в `DVD/`. Такой ID — ещё один источник типа, до размера.
-7. **Переименование не трогает `Title` в CFG.** После переименования «Retail Game» → «Grand Theft Auto III» в `CFG/SLUS_200.62.cfg` осталось `Title=Retail Game`, и страница сведений темы OPL покажет старое название. Это META-3 (v0.3): писать `Title` вместе с остальными сведениями.
-8. **Малозаметные флажки и поля в светлой теме.** Рамка непомеченного флажка, переключателя и поля ввода — `--input` (`oklch(0.922 0 0)`) на белом, контраст около 1,3:1 при норме 3:1 (WCAG 1.4.11). Хуже всего в окне удаления: флажок «Я понимаю, что файлы будут удалены» почти не виден. Нужно решение владельца: усилить `--input` для всех полей или только рамки флажков и переключателей.
-9. **ID из SYSTEM.CNF в окне переименования.** Предупреждение «в имени файла SLES_999.99, а в SYSTEM.CNF — SLUS_200.62» есть, но окно переименования не предлагает взять ID из образа: его нужно вписать руками.
-10. **Вердикт дампа после конвертации.** После перевода в ZSO у игр пропадают значки проверки («ещё не проверялся»), хотя данные образа те же. Можно переносить вердикт и хеши при конвертации или пересчитывать их по ходу сжатия.
-11. **Мелочи интерфейса.** Заголовки столбцов в виде списком не сортируют (сортировка — только через список «Название»); после удаления игры библиотека открывается с сортировкой по умолчанию; план добавления появляется ниже края окна, и к нему нужно прокрутить вручную.
+6. **Disc type from another game with the same ID.** Addition to item 1: the plan places "Tak - The Great Juju Challenge" (`SLUS_212.18`, an image without UDF and CD-XA) into `CD/`, although the device already has a game with this ID in `DVD/`. Such an ID is another source of the type, before size.
+7. **Renaming does not touch `Title` in CFG.** After renaming "Retail Game" → "Grand Theft Auto III", `Title=Retail Game` remained in `CFG/SLUS_200.62.cfg`, and the OPL theme's information page shows the old title. This is META-3 (v0.3): write `Title` together with the other information.
+8. **Barely visible checkboxes and fields in the light theme.** The border of an unchecked checkbox, toggle and input — `--input` (`oklch(0.922 0 0)`) on white, contrast about 1.3:1 against a 3:1 requirement (WCAG 1.4.11). Worst in the delete dialog: the "I understand that files will be deleted" checkbox is almost invisible. The owner's decision is needed: strengthen `--input` for all fields or only for checkbox and toggle borders.
+9. **ID from SYSTEM.CNF in the rename dialog.** The warning "the file name has SLES_999.99, but SYSTEM.CNF has SLUS_200.62" exists, but the rename dialog does not offer to take the ID from the image: it must be typed by hand.
+10. **Dump verdict after conversion.** After conversion to ZSO, games lose the verification icons ("not checked yet"), although the image data is the same. The verdict and hashes could be carried over during conversion or recomputed during compression.
+11. **Interface small things.** Column headers as a list do not sort (sorting — only through the "Title" list); after deleting a game the library opens with the default sort; the add plan appears below the window edge and must be scrolled to by hand.

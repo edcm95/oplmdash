@@ -44,7 +44,7 @@ async function fragmentedStick(page: Page, pieces?: unknown): Promise<() => stri
 }
 
 async function openGame(page: Page, title: string): Promise<void> {
-  await page.getByRole("searchbox", { name: /Search|Поиск/ }).fill(title);
+  await page.getByRole("searchbox", { name: "Search" }).fill(title);
   await page.getByRole("listitem").filter({ hasText: title }).first().click();
   await expect(page.getByTestId("game-title")).toHaveText(title);
 }
@@ -70,11 +70,11 @@ test("a fragmented game: warnings filter, card and pieces", async ({ page, reque
 
 test("simple mode keeps the warning and hides the count", async ({ page, request }) => {
   const title = await fragmentedStick(page);
-  await openLibrary(page, request, { language: "ru", simple: true });
+  await openLibrary(page, request, { language: "en", simple: true });
   await page.goto("/library");
   await expect(page.getByTestId("library-count")).toBeVisible();
   await openGame(page, title());
-  await expect(page.getByTestId("game-warnings")).toContainText("Игра лежит на носителе кусками (частей: 70)");
+  await expect(page.getByTestId("game-warnings")).toContainText("The game lies on the device in 70 pieces");
   await expect(page.getByTestId("game-fragments")).toHaveCount(0);
 });
 
@@ -96,7 +96,7 @@ test("OPL 1.1.0 says whether every file is one piece", async ({ page, request })
   );
 });
 
-for (const language of ["en", "ru"] as const) {
+for (const language of ["en"] as const) {
   for (const theme of ["light", "dark"] as const) {
     test(`fragments screenshot ${language} ${theme}`, async ({ page, request }) => {
       await page.setViewportSize({ width: 1280, height: 900 });

@@ -1,180 +1,180 @@
-# YAOPLM — план работ
+# YAOPLM — work plan
 
-> Версия 0.1 от 2026-10-22. Требования (`IMP-5` и т.д.) — в [SPEC.md](SPEC.md). Отмечайте `[x]`, когда пункт смёржен в `main`.
+> Version 0.1, 2026-10-22. Requirements (`IMP-5`, etc.) are in [SPEC.md](SPEC.md). Tick `[x]` when an item is merged into `main`.
 
-## Рабочий процесс
+## Workflow
 
-**Роли.**
-- **Пользователь** — владелец продукта и тестировщик на реальной PS2. Принимает вехи.
-- **Агент** (Claude Code) — разработчик: код, тесты, CI, документация.
+**Roles.**
+- **User** — product owner and tester on a real PS2. Accepts milestones.
+- **Agent** (Claude Code) — developer: code, tests, CI, documentation.
 
-**Цикл одной вехи:**
-1. Агент читает веху в этом файле и разбивает её на задачи (в плане сессии).
-2. Создаёт ветку `m<N>/<кратко>`, например `m1/core-formats`.
-3. Работает маленькими коммитами в стиле Conventional Commits на английском, со ссылками на ID требований: `feat(formats): ul.cfg writer (IMP-5)`.
-4. Пишет тесты вместе с кодом. Для интерфейса проверяет UI в браузере через server mode и Playwright.
-5. Открывает PR. В описании: что сделано, как проверено, **чек-лист проверки на PS2**.
-6. CI должен быть зелёным.
-7. Пользователь проверяет на консоли и пишет замечания. Агент исправляет.
-8. Мёрж обычным merge-коммитом, чтобы коммиты ветки остались в истории (ADR-0017); тег `v0.0.N` (или `v0.N.0` на крупных вехах), обновление этого файла и [DECISIONS.md](DECISIONS.md).
-9. Перед релизным тегом `v0.N.0` — проверка согласованности интерфейса по [plans/release-ui-consistency.md](plans/release-ui-consistency.md): правила, матрица состояний носителя, находки отдельными PR (решение владельца продукта 2026-10-25).
+**Cycle of one milestone:**
+1. The agent reads the milestone in this file and breaks it into tasks (in the session plan).
+2. Creates a branch `m<N>/<short>`, for example `m1/core-formats`.
+3. Works in small commits in Conventional Commits style in English, with requirement ID references: `feat(formats): ul.cfg writer (IMP-5)`.
+4. Writes tests together with the code. For the interface, checks the UI in the browser via server mode and Playwright.
+5. Opens a PR. In the description: what was done, how it was tested, a **PS2 test checklist**.
+6. CI must be green.
+7. The user tests on the console and writes remarks. The agent fixes them.
+8. Merge with a regular merge commit so that the branch commits stay in history (ADR-0017); tag `v0.0.N` (or `v0.N.0` on major milestones), update this file and [DECISIONS.md](DECISIONS.md).
+9. Before a release tag `v0.N.0` — the UI consistency pass in [plans/release-ui-consistency.md](plans/release-ui-consistency.md): rules, medium state matrix, findings in separate PRs (product owner's decision 2026-10-25).
 
-Если по ходу появляется решение, меняющее спецификацию, агент записывает ADR в DECISIONS.md и сообщает пользователю.
+If a decision that changes the specification appears along the way, the agent records an ADR in DECISIONS.md and informs the user.
 
 ---
 
-## M0 — Фундамент
-Цель: пустой, но собирающийся на всех ОС каркас с тремя интерфейсами.
-- [x] Установить toolchain: rustup (MSVC, stable), `cargo-tauri` / `@tauri-apps/cli`, pnpm через corepack. Проверить C++-нагрузку VS Build Tools 2026.
-- [x] Cargo workspace по [ARCHITECTURE.md §3](ARCHITECTURE.md), `rust-toolchain.toml`, lint-настройки (`clippy -D warnings`, `rustfmt.toml`).
-- [x] `yaoplm-api`: заглушки `Request::Ping`, `Request::Version`, `JobEvent`; генерация TS-типов через ts-rs.
+## M0 — Foundation
+Goal: an empty but buildable skeleton on all OSes with three interfaces.
+- [x] Install the toolchain: rustup (MSVC, stable), `cargo-tauri` / `@tauri-apps/cli`, pnpm via corepack. Check the C++ workload of VS Build Tools 2026.
+- [x] Cargo workspace per [ARCHITECTURE.md §3](ARCHITECTURE.md), `rust-toolchain.toml`, lint settings (`clippy -D warnings`, `rustfmt.toml`).
+- [x] `yaoplm-api`: stubs `Request::Ping`, `Request::Version`, `JobEvent`; TS type generation via ts-rs.
 - [x] `apps/cli`: `yaoplm --version`, `yaoplm rpc`.
-- [x] `apps/server`: axum, `/health`, `/api/rpc`, `/api/events`, раздача SPA; `--bind`, `--token`, `--root`.
-- [x] `apps/desktop`: окно Tauri 2 с SPA, команды `rpc` и `subscribe`.
-- [x] `web/`: Vite + React + TS + Tailwind + shadcn/ui, переключатель транспорта, i18n en/ru, светлая и тёмная тема, пустой экран библиотеки.
-- [x] `.claude/launch.json` для превью веб-интерфейса (dev-сервер Vite и `yaoplm-server`).
-- [x] Smoke-тест Playwright против `yaoplm-server`.
-- [x] CI `ci.yml` на Windows, Linux и macOS. Проверка, что ядро не зависит от tauri/axum/tokio.
+- [x] `apps/server`: axum, `/health`, `/api/rpc`, `/api/events`, SPA serving; `--bind`, `--token`, `--root`.
+- [x] `apps/desktop`: Tauri 2 window with the SPA, commands `rpc` and `subscribe`.
+- [x] `web/`: Vite + React + TS + Tailwind + shadcn/ui, transport switcher, English UI, light and dark theme, empty library screen.
+- [x] `.claude/launch.json` for previewing the web interface (Vite dev server and `yaoplm-server`).
+- [x] Playwright smoke test against `yaoplm-server`.
+- [x] CI `ci.yml` on Windows, Linux and macOS. Check that the core does not depend on tauri/axum/tokio.
 
-Итог: PR #1, тег `v0.0.1`. Решения по ходу — ADR-0012…0015.
+Summary: PR #1, tag `v0.0.1`. Decisions along the way — ADR-0012…0015.
 
-**Готово, когда:** CI зелёный, `pnpm tauri dev` открывает окно на Windows, `yaoplm-server` отдаёт тот же UI в браузере, `yaoplm rpc '{"type":"Ping"}'` отвечает.
+**Done when:** CI is green, `pnpm tauri dev` opens a window on Windows, `yaoplm-server` serves the same UI in the browser, `yaoplm rpc '{"type":"Ping"}'` responds.
 
-## M1 — Форматы OPL (ядро без UI)
-Цель: побайтно точная работа с форматами OPL, покрытая тестами.
-- [x] Для каждого формата сначала читаем код в официальном OPL и форках из `D:\yaoplm-testdata\refs\` (ADR-0015) и записываем найденные граничные случаи в тесты.
-- [x] Фикстуры в `yaoplm-test-support`: крошечный ISO с `SYSTEM.CNF`, образ без `BOOT2`, CD- и DVD-варианты.
-- [x] Загрузочный тестовый ISO из открытого homebrew-ELF для проверки на консоли, плюс вариант > 4 ГиБ с файлом-заполнителем для `ul`.
-- [x] Чтение ISO9660 и разбор `SYSTEM.CNF` точно как в OPL (IMP-2). Тесты на краевые случаи: регистр, `cdrom0:\`, `;1`, ID длиннее 11 символов.
-- [x] Правила имён OPL: старый формат `XXXX_YYY.ZZ.` и лимиты 160/159 (IMP-4).
-- [x] `USBA_crc32` с тестовыми векторами. Векторы получить из исходника OPL (скомпилировать C-функцию локально в тесте сравнения или вычислить вручную; см. research/02 §5.3).
-- [x] `ul.cfg`: чтение и запись 64-байтных записей, имена чанков, план нарезки по 1 ГиБ (IMP-5).
-- [x] CFG: парсер и писатель с сохранением неизвестных ключей, CRLF, лимиты, round-trip-тесты (CFG-1).
-- [x] ZSO: чтение и запись (заголовок `ZISO`, индекс, блоки LZ4). Сверка с `ziso.py` из репозитория OPL.
-- [x] Имена файлов ART и `CHT/`/`VMC/`/`APPS/title.cfg`, только модель и парсеры.
-- [x] CLI: `yaoplm info <image>` (ID, тип носителя, размер), `yaoplm scan <root>` (вывод библиотеки).
-- [x] Fuzz-цели для парсеров ISO, CFG, `ul.cfg` и ZSO.
+## M1 — OPL formats (core without UI)
+Goal: byte-exact handling of OPL formats, covered by tests.
+- [x] For each format, first read the code in official OPL and the forks from `D:\yaoplm-testdata\refs\` (ADR-0015) and record the edge cases found in tests.
+- [x] Fixtures in `yaoplm-test-support`: a tiny ISO with `SYSTEM.CNF`, an image without `BOOT2`, CD and DVD variants.
+- [x] A bootable test ISO from an open-source homebrew ELF for checking on the console, plus a variant > 4 GiB with a filler file for `ul`.
+- [x] ISO9660 reading and `SYSTEM.CNF` parsing exactly as in OPL (IMP-2). Edge-case tests: case, `cdrom0:\`, `;1`, IDs longer than 11 characters.
+- [x] OPL naming rules: the old format `XXXX_YYY.ZZ.` and the 160/159 limits (IMP-4).
+- [x] `USBA_crc32` with test vectors. Obtain the vectors from the OPL source (compile the C function locally in a comparison test or compute them by hand; see research/02 §5.3).
+- [x] `ul.cfg`: reading and writing 64-byte records, chunk names, a 1 GiB splitting plan (IMP-5).
+- [x] CFG: parser and writer that preserve unknown keys, CRLF, limits, round-trip tests (CFG-1).
+- [x] ZSO: reading and writing (`ZISO` header, index, LZ4 blocks). Cross-check against `ziso.py` from the OPL repository.
+- [x] ART file names and `CHT/`/`VMC/`/`APPS/title.cfg`, model and parsers only.
+- [x] CLI: `yaoplm info <image>` (ID, medium type, size), `yaoplm scan <root>` (library output).
+- [x] Fuzz targets for the ISO, CFG, `ul.cfg` and ZSO parsers.
 
-Итог: PR #4, тег `v0.0.2`. Решения по ходу — ADR-0016…0018, находки — research/08. Сверка `yaoplm scan` с OPL на флешке, подготовленной OPL Manager, ещё не сделана: такой флешки пока нет (тестовая E: пустая, на ней `scan` совпадает с OPL).
+Summary: PR #4, tag `v0.0.2`. Decisions along the way — ADR-0016…0018, findings — research/08. Cross-checking `yaoplm scan` against OPL on a flash drive prepared by OPL Manager has not been done yet: there is no such flash drive yet (test E: empty, `scan` on it matches OPL).
 
-**Готово, когда:** все тесты зелёные. `yaoplm scan` на реальной флешке пользователя, подготовленной OPL Manager, показывает то же, что OPL.
-**Проверка на PS2:** не нужна, только `yaoplm scan` по существующей флешке.
+**Done when:** all tests are green. `yaoplm scan` on the user's real flash drive prepared by OPL Manager shows the same as OPL.
+**PS2 check:** not needed, only `yaoplm scan` on an existing flash drive.
 
-## M2 — Импорт на устройство
-Цель: из CLI можно подготовить рабочую флешку.
-- [x] Обнаружение устройств и ФС (DEV-1, DEV-2).
-- [x] Создание структуры папок (LIB-3).
-- [x] Конвейер импорта: план, затем выполнение; копирование с предвыделением, прогрессом и отменой (IMP-7, IMP-9, IMP-10, IMP-11).
-- [x] Выбор CD или DVD (IMP-3), имена (IMP-4), удаление `games.bin` (IMP-8).
-- [x] FAT32 и игра >4 ГиБ → нарезка `ul` с журналом (IMP-5); exFAT → цельный ISO (IMP-6).
-- [x] Импорт BIN/CUE с одной дорожкой → ISO (IMP-1).
-- [x] Переименование, удаление, перенос CD↔DVD (GAME-1..3).
-- [x] Резервные копии CFG (CFG-5).
-- [x] CLI: `yaoplm add`, `yaoplm rename`, `yaoplm rm`, вывод плана и `--yes`.
+## M2 — Import to the device
+Goal: a working flash drive can be prepared from the CLI.
+- [x] Device and FS detection (DEV-1, DEV-2).
+- [x] Folder structure creation (LIB-3).
+- [x] Import pipeline: plan, then execution; copying with preallocation, progress and cancellation (IMP-7, IMP-9, IMP-10, IMP-11).
+- [x] CD or DVD selection (IMP-3), names (IMP-4), deletion of `games.bin` (IMP-8).
+- [x] FAT32 and a game >4 GiB → `ul` splitting with a journal (IMP-5); exFAT → a whole ISO (IMP-6).
+- [x] BIN/CUE import with a single track → ISO (IMP-1).
+- [x] Renaming, deletion, CD↔DVD move (GAME-1..3).
+- [x] CFG backups (CFG-5).
+- [x] CLI: `yaoplm add`, `yaoplm rename`, `yaoplm rm`, plan output and `--yes`.
 
-Итог: PR #7, тег `v0.0.3`. Решения по ходу — ADR-0019…0021, находки — research/09. Тестовые образы для консоли лежат в `D:\yaoplm-testdata\out\`. Проверка на PS2 ещё не сделана: замечания по ней исправляем отдельными PR.
+Summary: PR #7, tag `v0.0.3`. Decisions along the way — ADR-0019…0021, findings — research/09. Test images for the console are in `D:\yaoplm-testdata\out\`. PS2 testing has not been done yet: we fix remarks about it in separate PRs.
 
-**Проверка на PS2:**
-1. FAT32, CD-игра — видна и запускается.
-2. FAT32, DVD-игра до 4 ГиБ — видна и запускается.
-3. FAT32, игра больше 4 ГиБ (`ul`) — видна и запускается.
-4. exFAT с OPL 1.2 beta, игра больше 4 ГиБ — видна и запускается.
-5. Те же игры на SD-карте в MX4SIO — видны и запускаются.
-6. OPL, запущенный с эмулятора карты памяти, видит игры на флешке и MX4SIO так же, как запущенный с карты Sony.
-7. Переименованная игра не потеряла настройки.
-8. Тестовый homebrew-ISO (CD и вариант `ul` > 4 ГиБ) виден в списке.
+**PS2 check:**
+1. FAT32, CD game — visible and runs.
+2. FAT32, DVD game up to 4 GiB — visible and runs.
+3. FAT32, game larger than 4 GiB (`ul`) — visible and runs.
+4. exFAT with OPL 1.2 beta, game larger than 4 GiB — visible and runs.
+5. The same games on an SD card in MX4SIO — visible and run.
+6. OPL launched from the memory card emulator sees games on the flash drive and MX4SIO the same as when launched from a Sony card.
+7. A renamed game did not lose its settings.
+8. The test homebrew ISO (CD and the `ul` variant > 4 GiB) is visible in the list.
 
-## M3 — Десктопный интерфейс (MVP)
-- [x] Экран библиотеки: сетка и список, поиск, фильтры, виртуализация (LIB-5).
-- [x] Карточка игры: ID, носитель, размер, пути, предупреждения (LIB-4).
-- [x] Добавление через диалог и drag-and-drop, экран плана с подтверждением, панель заданий.
-- [x] Переименование, удаление и перенос CD↔DVD из карточки игры; восстановление незавершённой операции по журналу (GAME-1..3, ADR-0021). В M2 есть только CLI.
-- [x] Выбор устройства, настройки (профиль, формат имени, язык, тема).
-- [x] e2e-тесты Playwright основных сценариев против server mode, скриншоты в PR.
+## M3 — Desktop interface (MVP)
+- [x] Library screen: grid and list, search, filters, virtualization (LIB-5).
+- [x] Game card: ID, medium, size, paths, warnings (LIB-4).
+- [x] Adding via a dialog and drag-and-drop, plan screen with confirmation, jobs panel.
+- [x] Renaming, deletion and CD↔DVD move from the game card; recovery of an unfinished operation from the journal (GAME-1..3, ADR-0021). M2 has only the CLI.
+- [x] Device selection, settings (profile, name format, theme).
+- [x] Playwright e2e tests of the main scenarios against server mode, screenshots in the PR.
 
-Итог: PR #9, тег `v0.0.4`. Находки по интерфейсам соседей — research/10. В API добавлены `ListDir` (обзор папок внутри корней сервера) и журнал шагов задания (`JobEvent::Log`, `JobInfo.log`). Настройки интерфейса пока в `localStorage` (ARCHITECTURE §6). Фикстурная библиотека для e2e и превью — `make_library`. Проверка сценария U1 в GUI на Windows и на консоли ещё не сделана: замечания по ней исправляем отдельными PR.
+Summary: PR #9, tag `v0.0.4`. Findings on neighbouring interfaces — research/10. Added to the API: `ListDir` (browsing folders inside the server's roots) and the job step journal (`JobEvent::Log`, `JobInfo.log`). Interface settings are still in `localStorage` (ARCHITECTURE §6). The fixture library for e2e and previews — `make_library`. Scenario U1 has not yet been tested in the GUI on Windows or on the console: we fix remarks about it in separate PRs.
 
-**Проверка:** пользователь проходит сценарий U1 в GUI на Windows. По возможности ещё на Linux или Steam Deck.
+**Check:** the user goes through scenario U1 in the GUI on Windows. If possible, also on Linux or Steam Deck.
 
-## M4 — Обложки и метаданные → **v0.1.0**
-- [x] Встроенная база названий (META-1): скрипт генерации из PCSX2 GameIndex и libretro DAT, `data/ATTRIBUTION.md`.
-- [x] Обложки по ID: xlenore → libretro, перекодирование в PNG, размеры профиля, кэш (ART-1, ART-2 COV).
-- [x] Ручная замена и массовая загрузка (ART-3, ART-4).
-- [x] Экран «О программе» с атрибуцией источников.
-- [x] Релизная сборка: `release-desktop.yml` (Windows, Linux, macOS ad-hoc), первая предварительная версия.
+## M4 — Covers and metadata → **v0.1.0**
+- [x] Built-in title database (META-1): a generation script from PCSX2 GameIndex and the libretro DAT, `data/ATTRIBUTION.md`.
+- [x] Covers by ID: xlenore → libretro, re-encoding to PNG, profile sizes, cache (ART-1, ART-2 COV).
+- [x] Manual replacement and bulk download (ART-3, ART-4).
+- [x] "About" screen with source attribution.
+- [x] Release build: `release-desktop.yml` (Windows, Linux, macOS ad-hoc), first pre-release.
 
-Итог: PR #14, тег `v0.1.0`. Решения по ходу — ADR-0024 (база названий вшита в бинарник), ADR-0025 (поиск обложек как задание, запись как план, резервная копия переносом); находки по соседям — research/11. Новый крейт `yaoplm-net` (HTTP-клиент с лимитом и ETag, кэш `art-cache/` + `cache.sqlite`, зеркала источников), запросы `FetchArt`, `SetArt`, `DeleteArt`, `Attribution`, `ArtCache`, `ClearArtCache`, команды `yaoplm art …` и `yaoplm about`, маршрут `/media/art` на сервере и asset-протокол на десктопе. Попутно исправлен баг M3: сервер отдавал 404 на прямые ссылки с точкой в пути. Updater не подключён: ключа подписи нет. Релиз v0.1.0 опубликован как пре-релиз 2026-10-23. Проверка обложек на консоли ещё впереди: пошаговый список — [testing/m4-console-checklist.md](testing/m4-console-checklist.md); замечания по ней исправляем отдельными PR.
+Summary: PR #14, tag `v0.1.0`. Decisions along the way — ADR-0024 (the title database is embedded in the binary), ADR-0025 (cover search as a job, writing as a plan, backup by moving); findings on neighbours — research/11. New crate `yaoplm-net` (HTTP client with rate limit and ETag, `art-cache/` + `cache.sqlite` cache, source mirrors), requests `FetchArt`, `SetArt`, `DeleteArt`, `Attribution`, `ArtCache`, `ClearArtCache`, commands `yaoplm art …` and `yaoplm about`, the `/media/art` route on the server and the asset protocol on the desktop. A M3 bug was fixed along the way: the server returned 404 for direct links with a dot in the path. The updater is not connected: there is no signing key. Release v0.1.0 was published as a pre-release on 2026-10-23. Cover testing on the console is still ahead: the step-by-step list — [testing/m4-console-checklist.md](testing/m4-console-checklist.md); we fix remarks about it in separate PRs.
 
-**Проверка на PS2:** обложки, записанные YAOPLM на флешку, видны в OPL 1.2 beta и в 1.1.0; игра без обложки показывает заглушку OPL; после замены OPL показывает новую обложку.
+**PS2 check:** covers written by YAOPLM to a flash drive are visible in OPL 1.2 beta and in 1.1.0; a game without a cover shows the OPL placeholder; after replacement OPL shows the new cover.
 
-## M5 — Проверка дампов, настройки игр, VMC, загрузчики → v0.2.0
-- [x] Хеши за один проход, кэш хешей, Redump DAT (META-2, GAME-5; PR #21).
-- [x] Конвертации ISO↔ZSO↔`ul` в любую сторону (GAME-4; PR #21).
-- [x] Импорт CHD, zip, 7z, многодорожечных BIN/CUE (IMP-1b; PR #21).
-- [x] Тексты ядра — фразы, ключ и параметры (ADR-0029): заголовки планов, транзакций и заданий и ошибки API (PR #23); уведомления, предупреждения игр, советы по носителю, причины пропуска, строки журнала и числа по языку (следующий PR).
-- [x] Редактор CFG (CFG-2; PR #31, ADR-0036, research/15): правка по правилам меню OPL, только изменённого, с ключами «было → стало» в плане; в простом режиме режимы 1–6 и слот VMC 1, в расширенном — всё (решение владельца продукта 2026-10-24); `yaoplm cfg`.
-- [x] Создание отформатированных VMC (VMC-1; PR #31, ADR-0036): побайтно как genvmc OPL, одним файлом с предвыделением, проверка числа кусков после записи (Windows), назначение в слот в том же плане, замена только по явному запросу с резервной копией; `yaoplm vmc ls`, `yaoplm vmc create`. Проверка на консоли — `docs/testing/m5-pr2b-console-checklist.md`.
-- [x] Остальные типы обложек, импорт наборов картинок (ART-2, ART-5; PR #25): восемь слотов в карточке игры с вариантами на выбор, источники по типам, наборы OPL Manager, папки и `art.tar` только для игр на носителе (ADR-0032, ADR-0033).
-- [x] Обложки при импорте (ART-8, SPEC §5.4.1; PR #25, ADR-0031): галочка «Скачать обложки» на экране добавления, поиск по ID до подтверждения, транзакции записи обложек внутри плана импорта, `yaoplm add --covers`; слоты типов обложек в карточке игры с «Скачать», «Заменить», «Удалить» (ART-2, ART-3).
-- [x] Проверка дампов при добавлении (GAME-5; PR #25, ADR-0030; решение владельца продукта 2026-10-23, второй PR вехи вместе с обложками при импорте ART-8). Хеши считаются в том же проходе, что и запись на носитель, без отдельного чтения флешки; после записи игра сразу получает вердикт по DAT Redump, без DAT хеши сохраняются в кэш на будущее. Переключатель «Проверять дампы при добавлении» в настройках и на экране добавления, по умолчанию включён; в CLI — флаг у `yaoplm add`. Для CD из BIN/CUE и CHD сверять сырую дорожку данных, как её хеширует Redump: только так CD-образ может получить «подтверждён» (ISO с CD не совпадает никогда, ADR-0026).
-- [x] Названия из базы при добавлении игр (META-1; по просьбе владельца продукта 2026-10-23; PR #25, ADR-0031): переключатель на экране добавления, по умолчанию включён; `yaoplm add --db-titles`.
-- [x] Источник для каждого типа картинок (ART-1, ART-2, META-4; PR #29, ADR-0035, research/14; решение владельца продукта 2026-10-24): копия OPL Manager на archive.org по Range-запросам (все восемь типов), ScreenScraper по ключу разработчика, свой порядок источников у каждого типа, упаковка только своего региона, другие издания игры для скриншотов и логотипов, `YAOPLM_OFFLINE` в CI. Покрытие измерено; без ключа ScreenScraper цель 98 % не достигается.
-- [x] Доводка интерфейса и простой режим (UI-4, UI-5; PR #28, ADR-0034; замечания владельца продукта 2026-10-24, план и промпт — `docs/plans/m5-ui-simple-mode.md`): сетка библиотеки без наложений, обход всех экранов на разных размерах окна, простой режим по умолчанию, задания без шума, одна кнопка «Скачать все картинки», переключатели добавления только на экране добавления.
-- [x] Проверка фрагментации (IMP-7b, LIB-4; PR #34, ADR-0037): подсчёт кусков на Windows, Linux (FIBMAP под root, иначе «неизвестно») и macOS (пока «неизвестно» на FAT32/exFAT), правило профиля (64 в сумме на 1.2, каждый файл одним куском на 1.1.0, VMC одним куском), предупреждения в библиотеке и после записи; проверка на консоли — `docs/testing/m5-fragmentation-console-checklist.md`.
-- [ ] `yaoplm-server` и Docker-образ (SRV-1).
-- [x] Автоопределение профиля загрузчика по носителю (LIB-1, SPEC §5.1.1, ADR-0023; PR #37, ADR-0039, research/16 — PR #36; признаки по силе: контрольная сумма ELF OPL 1.0.0/1.1.0, файлы семейств, поколение `games.bin`, ключи `conf_opl.cfg`, имена ELF; exFAT/ZSO исключают 1.1.0; проверка — `docs/testing/m5-auto-profile-console-checklist.md`): установленный загрузчик → файлы настроек → exFAT/ZSO → умолчание; «Авто (по носителю)» в настройках по умолчанию, переопределение на носитель по серийному номеру тома; действующий профиль и причина на карточке устройства и в шапке библиотеки.
-- [x] Каталог загрузчиков как данные (LDR-1, ADR-0022; PR #39, ADR-0042, research/17): OPL 1.1.0, OPL 1.2.0 beta, YAOPL — канал, ассеты, источники хешей для проверки загрузки, пресеты путей (FreeMcBoot `UPDT/OPL.ELF`, PS2BBL `APPS/OPNPS2LD.ELF`, папка приложения), описания на en и ru, «Рекомендуем» у OPL 1.2.0 beta; `yaoplm loader ls`. Истории хешей новых сборок нет (решение владельца продукта 2026-10-25): сборку и канал называет версия внутри ELF (ADR-0041), `opl-stable.txt` — только замороженные выпуски; workflow по расписанию и `HASHES.txt` в CI форка не нужны.
-- [x] Загрузка сборки с проверкой SHA-256, кэш, лицензия и список изменений перед загрузкой, установка из своего архива (LDR-2; PR #41, ADR-0043): сведения о релизе по `ETag`, загрузка держится хеша, который видел пользователь, файлы только из релизов проекта, проверка размера, SHA-256 и версии внутри ELF; хранилище ELF в данных приложения; свой ELF, zip или 7z без сети; каталог из `main` для той же версии программы; `yaoplm loader release|download|import|files|update-catalog`; зеркала в тестах.
-- [x] Установка на USB и MX4SIO: папки по профилю, ELF по пресету способа запуска, резервная копия, манифест, строки для FreeMcBoot и PS2BBL (LDR-3, BOOT-1; PR #43, ADR-0044): один план (папки → ELF через временный файл с копией прежнего, три копии на путь → языковой пакет → манифест → стартовые настройки); тот же ELF не трогается, другой OPL заменяется, чужая программа — только с «Заменить этот файл»; строки для FreeMcBoot, PS2BBL, PS2BBL-MX4SIO и OSDMenu; `yaoplm loader install`; мастер «Установить загрузчик…» на карточке носителя.
-- [x] Определение установленного загрузчика и версии, «Обновить» только в пределах канала, откат (LDR-4; PR #44, ADR-0045); состояния карточки устройства по SPEC §5.10.1; автоматическое окно «Доступно обновление» при появлении носителя по кэшу каталога без сети, «Не сейчас» запоминается, кнопка на карточке открывает окно снова; настройка «Предлагать обновления загрузчика автоматически» (по умолчанию включена) выключает окно целиком, при запуске и при появлении носителя. Сборка известна по манифесту (пока его хеш совпадает с файлом), хешу замороженного выпуска или версии внутри ELF; последняя версия канала — из сохранённого ответа GitHub, сеть только по «Проверить обновления»; обновление меняет только ELF, языковой пакет и манифест; откат меняет местами ELF и последнюю копию; `yaoplm loader update|rollback`. «Заменить…» как явное действие — с LDR-7 (пункт ниже); до него «Переустановить…» открывает мастер установки.
-- [ ] Процесс-помощник с повышенными правами и форматирование съёмных носителей с защитой (DEV-3, ADR-0013, research/06).
-- [ ] Мастер подготовки носителя: «Установить…» на занятой или чужой флешке предлагает отформатировать (DEV-3, защиты ADR-0013) или оставить файлы и добавить OPL рядом; «Переустановить с нуля»; затем папки и загрузчик (DEV-4, после LDR-3).
-- [ ] Путь новичка в простом режиме (UI-6, SPEC §5.11.2, ADR-0038; решение владельца продукта 2026-10-24, после DEV-4 и LDR-3): шаг «что дальше» в ответе `InspectDevice` и в `yaoplm device`; подсказка с главной кнопкой на карточке устройства, в пустой библиотеке и в итоге каждой записи; «Подготовить носитель…» для носителей, которые исправит форматирование; два вопроса мастера подготовки и выбор ФС по правилам OPL («Не знаю» → FAT32); отметка «OPL на карте памяти» на носитель; «Как запустить на PS2»; переключатель подсказок в настройках.
-- [ ] Выбор сборки и версии (LDR-6, SPEC §5.10.2, ADR-0038; решение владельца продукта 2026-10-24): карточки OPL 1.1.0, OPL 1.2.0 beta и YAOPL с описанием и «Рекомендуем» (`summary`, `recommended` в каталоге); версия, дата релиза, размер, короткий список изменений, ссылки на релиз и коммит — в мастере установки и в окне «Доступно обновление», там же «Что изменилось с вашей версии»; «Другая версия…» в расширенном режиме по релизам репозитория (у upstream — `latest` и `v1.1.0`).
-- [ ] Версионные релизы YAOPL (ADR-0038; задача в `belomaxorka/yaopl`, решение владельца продукта 2026-10-24): CI публикует каждую сборку неизменяемым релизом с тегом версии рядом с `latest`, `FORK.md` это описывает; после этого YAOPL появляется в «Другая версия…».
-- [ ] Замена сборки (LDR-7, SPEC §5.10.3, ADR-0038; решение владельца продукта 2026-10-24): OPL 1.1.0 ↔ 1.2.0 beta ↔ YAOPL одним планом с сохранением игр и настроек; папки новой сборки создаются; раздел «Что изменится для игр»: при переходе на 1.1.0 — ZSO с конвертацией в ISO, игры не одним куском, exFAT (замена недоступна, путь через подготовку заново); при уходе с 1.1.0 — обложки JPG и BMP с перекодированием в PNG; загрузчик меняется последним; «Вернуть прежнюю сборку».
-- [ ] Перед тегом v0.2.0: проверка согласованности интерфейса ([plans/release-ui-consistency.md](plans/release-ui-consistency.md); решение владельца продукта 2026-10-25): карточка носителя, шапка библиотеки, подсказки «Что дальше», вопросы о профиле, уведомления и кнопки по матрице состояний, оба режима, обе темы, en/ru, axe; заранее — фикстура «съёмный носитель» для E2E и решение о режимах «носитель для PS2» и «папка для SMB».
-- [ ] Находки обхода интерфейса на настоящей флешке (2026-10-24, план — `docs/plans/m5-walkthrough-findings.md`): тип диска из DAT Redump и базы названий, а не по размеру образа; честная оценка «осталось» в начале записи; пути без `\\?\` и понятные причины пропуска; итог поиска картинок по играм плана. Обход настольного приложения (там же, пп. 6–11): тип диска по игре с тем же ID, `Title` в CFG при переименовании (META-3), контраст флажков и полей, ID из SYSTEM.CNF в окне переименования, вердикт дампа после конвертации.
+## M5 — Dump verification, game settings, VMC, loaders → v0.2.0
+- [x] Hashes in one pass, hash cache, Redump DAT (META-2, GAME-5; PR #21).
+- [x] ISO↔ZSO↔`ul` conversions in either direction (GAME-4; PR #21).
+- [x] CHD, zip, 7z and multi-track BIN/CUE import (IMP-1b; PR #21).
+- [x] Core texts — phrases, key and parameters (ADR-0029): plan, transaction and job titles and API errors (PR #23); notifications, game warnings, medium tips, skip reasons, log lines and numbers (next PR).
+- [x] CFG editor (CFG-2; PR #31, ADR-0036, research/15): editing by OPL menu rules, only what changed, with "before → after" keys in the plan; in simple mode modes 1–6 and VMC slot 1, in advanced mode everything (product owner's decision 2026-10-24); `yaoplm cfg`.
+- [x] Creating formatted VMCs (VMC-1; PR #31, ADR-0036): byte-exact as OPL's genvmc, as a single file with preallocation, checking the fragment count after writing (Windows), assigning to a slot in the same plan, replacement only on explicit request with a backup; `yaoplm vmc ls`, `yaoplm vmc create`. Console check — `docs/testing/m5-pr2b-console-checklist.md`.
+- [x] Remaining cover types, importing image sets (ART-2, ART-5; PR #25): eight slots in the game card with variants to choose from, sources by type, OPL Manager sets, folders and `art.tar` only for games on the medium (ADR-0032, ADR-0033).
+- [x] Covers on import (ART-8, SPEC §5.4.1; PR #25, ADR-0031): a "Download covers" checkbox on the add screen, search by ID before confirmation, cover-writing transactions inside the import plan, `yaoplm add --covers`; cover-type slots in the game card with "Download", "Replace", "Delete" (ART-2, ART-3).
+- [x] Dump verification on add (GAME-5; PR #25, ADR-0030; product owner's decision 2026-10-23, the milestone's second PR together with covers on import ART-8). Hashes are computed in the same pass as writing to the medium, without a separate read of the flash drive; after writing, the game immediately gets a Redump DAT verdict; without a DAT the hashes are saved to the cache for the future. The "Verify dumps on add" toggle in settings and on the add screen, on by default; in the CLI — a flag on `yaoplm add`. For CD from BIN/CUE and CHD, verify the raw data track as Redump hashes it: only then can a CD image get "verified" (an ISO never matches a CD, ADR-0026).
+- [x] Titles from the database when adding games (META-1; at the product owner's request 2026-10-23; PR #25, ADR-0031): a toggle on the add screen, on by default; `yaoplm add --db-titles`.
+- [x] A source for each image type (ART-1, ART-2, META-4; PR #29, ADR-0035, research/14; product owner's decision 2026-10-24): the OPL Manager copy on archive.org via Range requests (all eight types), ScreenScraper with a developer key, its own source order per type, packaging only its own region, other editions of the game for screenshots and logos, `YAOPLM_OFFLINE` in CI. Coverage has been measured; without a ScreenScraper key the 98% goal is not reached.
+- [x] Interface polish and simple mode (UI-4, UI-5; PR #28, ADR-0034; product owner's remarks 2026-10-24, plan and prompt — `docs/plans/m5-ui-simple-mode.md`): a library grid without overlaps, walking all screens at different window sizes, simple mode on by default, quiet jobs, one "Download all images" button, add toggles only on the add screen.
+- [x] Fragmentation check (IMP-7b, LIB-4; PR #34, ADR-0037): fragment counting on Windows, Linux (FIBMAP under root, otherwise "unknown") and macOS (for now "unknown" on FAT32/exFAT), the profile rule (64 in total on 1.2, each file in one piece on 1.1.0, VMC in one piece), warnings in the library and after writing; console check — `docs/testing/m5-fragmentation-console-checklist.md`.
+- [ ] `yaoplm-server` and the Docker image (SRV-1).
+- [x] Automatic loader profile detection by medium (LIB-1, SPEC §5.1.1, ADR-0023; PR #37, ADR-0039, research/16 — PR #36; signs by strength: the checksum of the OPL 1.0.0/1.1.0 ELF, family files, the `games.bin` generation, `conf_opl.cfg` keys, ELF names; exFAT/ZSO exclude 1.1.0; check — `docs/testing/m5-auto-profile-console-checklist.md`): installed loader → settings files → exFAT/ZSO → default; "Auto (by medium)" in settings by default, override per medium by volume serial number; the active profile and the reason on the device card and in the library header.
+- [x] Loader catalogue as data (LDR-1, ADR-0022; PR #39, ADR-0042, research/17): OPL 1.1.0, OPL 1.2.0 beta, YAOPL — channel, assets, hash sources for verifying downloads, path presets (FreeMcBoot `UPDT/OPL.ELF`, PS2BBL `APPS/OPNPS2LD.ELF`, the application folder), descriptions in English, "Recommended" on OPL 1.2.0 beta; `yaoplm loader ls`. There is no hash history for new builds (product owner's decision 2026-10-25): the build and channel are named by the version inside the ELF (ADR-0041), `opl-stable.txt` — frozen releases only; the scheduled workflow and `HASHES.txt` in the fork's CI are not needed.
+- [x] Build download with SHA-256 verification, cache, licence and changelog before download, installation from one's own archive (LDR-2; PR #41, ADR-0043): release details via `ETag`, the download is held to the hash the user saw, files only from the project's releases, checking size, SHA-256 and the version inside the ELF; ELF storage in the application data; one's own ELF, zip or 7z without network; the catalogue from `main` for the same program version; `yaoplm loader release|download|import|files|update-catalog`; mirrors in tests.
+- [x] Installation on USB and MX4SIO: folders by profile, ELF by boot-method preset, backup, manifest, lines for FreeMcBoot and PS2BBL (LDR-3, BOOT-1; PR #43, ADR-0044): one plan (folders → ELF via a temporary file with a copy of the previous one, three copies per path → language pack → manifest → startup settings); the same ELF is not touched, another OPL is replaced, a foreign program — only with "Replace this file"; lines for FreeMcBoot, PS2BBL, PS2BBL-MX4SIO and OSDMenu; `yaoplm loader install`; the "Install loader…" wizard on the medium card.
+- [x] Detecting the installed loader and version, "Update" only within the channel, rollback (LDR-4; PR #44, ADR-0045); device card states per SPEC §5.10.1; the automatic "Update available" window when a medium appears, from the catalogue cache without network, "Not now" is remembered, the button on the card opens the window again; the "Offer loader updates automatically" setting (on by default) turns the window off entirely, at startup and when a medium appears. The build is known by the manifest (while its hash matches the file), the hash of a frozen release or the version inside the ELF; the latest channel version — from the saved GitHub response, network only via "Check for updates"; an update changes only the ELF, language pack and manifest; rollback swaps the ELF and the latest copy; `yaoplm loader update|rollback`. "Replace…" as an explicit action — with LDR-7 (item below); until then "Reinstall…" opens the installation wizard.
+- [ ] Helper process with elevated privileges and protected formatting of removable media (DEV-3, ADR-0013, research/06).
+- [ ] Medium preparation wizard: "Install…" on an occupied or foreign flash drive offers to format (DEV-3, ADR-0013 protections) or keep the files and add OPL alongside; "Reinstall from scratch"; then folders and loader (DEV-4, after LDR-3).
+- [ ] Beginner path in simple mode (UI-6, SPEC §5.11.2, ADR-0038; product owner's decision 2026-10-24, after DEV-4 and LDR-3): the "what next" step in the `InspectDevice` response and in `yaoplm device`; a hint with a main button on the device card, in the empty library and at the end of every write; "Prepare medium…" for media that formatting will fix; the preparation wizard's two questions and FS choice by OPL rules ("Don't know" → FAT32); the "OPL on the memory card" mark per medium; "How to run on PS2"; the hints toggle in settings.
+- [ ] Build and version selection (LDR-6, SPEC §5.10.2, ADR-0038; product owner's decision 2026-10-24): cards for OPL 1.1.0, OPL 1.2.0 beta and YAOPL with a description and "Recommended" (`summary`, `recommended` in the catalogue); version, release date, size, short changelog, links to the release and commit — in the installation wizard and in the "Update available" window, along with "What changed since your version"; "Other version…" in advanced mode by repository releases (upstream — `latest` and `v1.1.0`).
+- [ ] Versioned YAOPL releases (ADR-0038; task in `belomaxorka/yaopl`, product owner's decision 2026-10-24): CI publishes every build as an immutable release with a version tag next to `latest`, `FORK.md` describes this; after that YAOPL appears in "Other version…".
+- [ ] Build replacement (LDR-7, SPEC §5.10.3, ADR-0038; product owner's decision 2026-10-24): OPL 1.1.0 ↔ 1.2.0 beta ↔ YAOPL in one plan preserving games and settings; folders of the new build are created; the "What will change for games" section: when moving to 1.1.0 — ZSO with conversion to ISO, games not in one piece, exFAT (replacement unavailable, the path goes through preparation anew); when leaving 1.1.0 — JPG and BMP covers with re-encoding to PNG; the loader changes last; "Restore previous build".
+- [ ] Before the v0.2.0 tag: the UI consistency pass ([plans/release-ui-consistency.md](plans/release-ui-consistency.md); product owner's decision 2026-10-25): device card, library header, "What next" hints, profile questions, notifications and buttons per the state matrix, both modes, both themes, English, axe; beforehand — a "removable medium" fixture for E2E and a decision on the "medium for PS2" and "folder for SMB" modes.
+- [ ] Findings from walking the interface on a real flash drive (2026-10-24, plan — `docs/plans/m5-walkthrough-findings.md`): disc type from the Redump DAT and title database, not from the image size; an honest "remaining" estimate at the start of a write; paths without `\\?\` and clear skip reasons; the result of the image search per plan game. Desktop app walkthrough (same place, items 6–11): disc type by the game with the same ID, `Title` in CFG on rename (META-3), contrast of checkboxes and fields, ID from `SYSTEM.CNF` in the rename window, dump verdict after conversion.
 
-**Проверка на PS2:**
-1. ZSO-игра запускается.
-2. Режимы совместимости применяются.
-3. VMC работает: сейв создаётся и читается.
-4. Игра с SMB-шары на домашнем сервере видна и запускается.
-5. Флешка и SD-карта, отформатированные и подготовленные YAOPLM с нуля, работают в OPL.
-6. OPL, установленный YAOPLM на флешку (`UPDT/OPL.ELF`), запускается из стандартного пункта меню FreeMcBoot без правки карты памяти.
-7. После «Обновить» на флешке стоит новая сборка YAOPL (версия видна на экране OPL), настройки и игры на месте; «Откатить» возвращает прежнюю.
-8. Флешка с чужим OPL неизвестной версии распознаётся как «OPL, версия неизвестна», и обновление ей не навязывается.
-9. Флешка, подготовленная в простом режиме только по подсказкам «Что дальше» (способ запуска «Не знаю», то есть FAT32), запускает OPL из FreeMcBoot и показывает добавленные игры с обложками.
-10. OPL v1.1.0, установленный через «Другая версия…», показывает на экране OPL версию 1.1.0.
-11. После «Заменить…» с YAOPL на OPL 1.1.0 с конвертацией ZSO → ISO все игры видны и запускаются; «Вернуть прежнюю сборку» возвращает YAOPL, игры на месте.
-12. После «Заменить…» с OPL 1.1.0 на 1.2.0 beta обложки, которые были JPG, видны.
+**PS2 check:**
+1. A ZSO game runs.
+2. Compatibility modes are applied.
+3. VMC works: a save is created and read.
+4. A game from an SMB share on a home server is visible and runs.
+5. A flash drive and an SD card formatted and prepared by YAOPLM from scratch work in OPL.
+6. OPL installed by YAOPLM on a flash drive (`UPDT/OPL.ELF`) launches from the standard FreeMcBoot menu item without editing the memory card.
+7. After "Update" the flash drive has the new YAOPL build (the version is visible on the OPL screen), settings and games are in place; "Roll back" restores the previous one.
+8. A flash drive with a foreign OPL of an unknown version is recognized as "OPL, version unknown", and an update is not forced on it.
+9. A flash drive prepared in simple mode using only the "What next" hints (boot method "Don't know", i.e. FAT32) launches OPL from FreeMcBoot and shows the added games with covers.
+10. OPL v1.1.0 installed via "Other version…" shows version 1.1.0 on the OPL screen.
+11. After "Replace…" from YAOPL to OPL 1.1.0 with ZSO → ISO conversion, all games are visible and run; "Restore previous build" brings YAOPL back, games are in place.
+12. After "Replace…" from OPL 1.1.0 to 1.2.0 beta, the covers that were JPG are visible.
 
-## M6 — PS1, APPS, RiptOPL, читы → v0.3.0
-- [ ] PS1: VCD и POPStarter (PS1-1); APPS (APP-1).
-- [ ] Профиль RiptOPL: 8-битный PNG, размеры, `art.tar`, дополнительные ключи CFG и биты (ART-6).
-- [ ] Редактор CHT (CHT-1), пресеты совместимости (CFG-3), метаданные в CFG (META-3).
-- [ ] Сведения об игре (META-3, по идее владельца продукта 2026-10-23): жанр, разработчик, издатель, дата выхода, число игроков и краткое описание на странице игры и в плане добавления; запись тех же полей в CFG, откуда их показывает страница сведений темы OPL (`Title`, `Genre`, `Release`, `Developer`, `Description`, `src/themes.c`). Источники: база CFG Tom-Bruise (GPL-3) и Wikidata (CC0), описания из Википедии (CC BY-SA) с указанием авторства; загрузка по запросу и с кэшем, как у обложек (ADR-0007). Перед началом — исследование источников и ADR.
-- [ ] Установка и обновление форков (RiptOPL пакетом `APPS/APP_RIPTOPL/`, wOPL, форк с MMCE) и игры на SD эмулятора карты памяти (LDR-1, LDR-3, LDR-4 для форков).
-- [ ] RiptOPL в выборе сборки и замене (LDR-6, LDR-7, SPEC §5.10.2–§5.10.3; решение владельца продукта 2026-10-24): описание и варианты `rolling`, `rolling-korium`, `rolling-ra`, `current-fan-favorite` вместо выбора версии; переходы на RiptOPL и обратно с разделом «Что изменится для игр» (PS1-игры в `POPS/` и `EMBER/`, биты 0x40/0x80 и ключи RiptOPL, `art.tar`, обложки глубже 8 бит); выбор версии wOPL и форка с MMCE.
+## M6 — PS1, APPS, RiptOPL, cheats → v0.3.0
+- [ ] PS1: VCD and POPStarter (PS1-1); APPS (APP-1).
+- [ ] RiptOPL profile: 8-bit PNG, sizes, `art.tar`, extra CFG keys and bits (ART-6).
+- [ ] CHT editor (CHT-1), compatibility presets (CFG-3), metadata in CFG (META-3).
+- [ ] Game information (META-3, at the product owner's idea 2026-10-23): genre, developer, publisher, release date, number of players and a short description on the game page and in the add plan; writing the same fields to CFG, from where the OPL theme's information page shows them (`Title`, `Genre`, `Release`, `Developer`, `Description`, `src/themes.c`). Sources: the Tom-Bruise CFG database (GPL-3) and Wikidata (CC0), descriptions from Wikipedia (CC BY-SA) with attribution; download on request and with a cache, like covers (ADR-0007). Before starting — research into the sources and an ADR.
+- [ ] Installing and updating forks (RiptOPL as the `APPS/APP_RIPTOPL/` package, wOPL, the MMCE fork) and games on the memory card emulator SD (LDR-1, LDR-3, LDR-4 for forks).
+- [ ] RiptOPL in build selection and replacement (LDR-6, LDR-7, SPEC §5.10.2–§5.10.3; product owner's decision 2026-10-24): a description and the variants `rolling`, `rolling-korium`, `rolling-ra`, `current-fan-favorite` instead of version selection; transitions to RiptOPL and back with the "What will change for games" section (PS1 games in `POPS/` and `EMBER/`, bits 0x40/0x80 and RiptOPL keys, `art.tar`, covers deeper than 8 bits); version selection for wOPL and the MMCE fork.
 
-**Проверка на PS2:** RiptOPL показывает обложки, подготовленные YAOPLM; игры с SD эмулятора карты памяти запускаются через MMCE.
+**PS2 check:** RiptOPL shows covers prepared by YAOPLM; games from the memory card emulator SD run via MMCE.
 
-## M7 — Публичный релиз
-- [ ] Перевести репозиторий в public. Сначала перепроверить, что в истории нет секретов.
-- [ ] Подпись: SignPath (Windows); при необходимости Apple Developer.
+## M7 — Public release
+- [ ] Make the repository public. First re-check that there are no secrets in the history.
+- [ ] Signing: SignPath (Windows); Apple Developer if needed.
 - [ ] Flatpak (Steam Deck), Homebrew cask, winget.
-- [ ] Документация пользователя на en и ru, анонс на psx-place.
+- [ ] User documentation in English, announcement on psx-place.
 
 ## Later
-Предложение агента (2026-10-23, не согласовано как требование): импорт с DVD-привода, то есть рип собственного диска владельца прямо на носитель с названием из базы и обложкой одним планом (IMP-1d); OrbitPS2 Manager сделал такое в октябре 2026 (`optical-drive.service`). Нужен ADR и прототип чтения привода на трёх ОС.
+Agent's proposal (2026-10-23, not agreed as a requirement): import from a DVD drive, i.e. ripping the owner's own disc directly to the medium with a title from the database and a cover in one plan (IMP-1d); OrbitPS2 Manager did this in October 2026 (`optical-drive.service`). An ADR and a drive-reading prototype on three OSes are needed.
 
-Сетевая библиотека (обсуждение с владельцем продукта 2026-10-24, отдельная веха после M5; перед началом — исследование и ADR):
-- Схема: папку раздаёт по SMB операционная система или NAS (OPL понимает только SMBv1, диалект `NT LM 0.12`), а YAOPLM — десктоп или `yaoplm-server` — открывает эту папку как библиотеку и наполняет её. Раскладка та же, что на флешке (`CD/`, `DVD/`, `ART/`, `CFG/`, `VMC/`; ISO и ZSO, `ul` не нужен); имя файла до 159 байт уже соблюдается. Встраивать Samba в программу не будем.
-- Помощник раздачи (NET-2) по ОС: Windows (общий доступ и компонент «SMB 1.0/CIFS Server» — программа только проверяет, включён ли он, и честно предупреждает о безопасности), Linux и Steam Deck (фрагмент настроек Samba с SMBv1), macOS (Samba из Homebrew или Docker), NAS (минимальный протокол SMB1).
-- Запись сетевых настроек OPL (`conf_network.cfg`: `smb_ip`, `smb_share`, `smb_user`, `smb_port`) на флешку или карту памяти, чтобы на консоли ничего не вводить; проверка раздачи «увидит ли её OPL».
-- `yaoplm-server`: открывать подпапку корня как библиотеку прямо из браузера (не выходя за корень), удобный запуск (ярлык или служба), Docker-образ (SRV-1), инструкция по запуску с токеном и раздачей.
-- Десктоп: переключатель «Управление с других устройств» — веб-интерфейс программы в локальной сети, пока она запущена; по умолчанию выключен, адрес и код доступа на экране (ADR-0009, ADR-0012). На PS2 и Samba он не влияет.
-- Запасной вариант, если настройка SMBv1 окажется слишком тяжёлой: встроенный минимальный SMB1-сервер на нестандартном порту (порт SMB в OPL настраивается, `smb_port`), чтобы не конфликтовать с системным SMB на 445.
+Network library (discussion with the product owner 2026-10-24, a separate milestone after M5; research and an ADR before starting):
+- Scheme: the folder is shared over SMB by the operating system or a NAS (OPL understands only SMBv1, dialect `NT LM 0.12`), and YAOPLM — the desktop or `yaoplm-server` — opens this folder as a library and fills it. The layout is the same as on a flash drive (`CD/`, `DVD/`, `ART/`, `CFG/`, `VMC/`; ISO and ZSO, `ul` not needed); the file name limit of 159 bytes is already respected. We will not embed Samba into the program.
+- Sharing assistant (NET-2) per OS: Windows (sharing and the "SMB 1.0/CIFS Server" component — the program only checks whether it is enabled and honestly warns about security), Linux and Steam Deck (a Samba settings fragment with SMBv1), macOS (Samba from Homebrew or Docker), NAS (minimal SMB1 protocol).
+- Writing OPL network settings (`conf_network.cfg`: `smb_ip`, `smb_share`, `smb_user`, `smb_port`) to a flash drive or memory card so that nothing has to be entered on the console; checking the share — "will OPL see it".
+- `yaoplm-server`: open a subfolder of the root as a library directly from the browser (without leaving the root), convenient launch (shortcut or service), Docker image (SRV-1), instructions for running with a token and a share.
+- Desktop: the "Control from other devices" toggle — the program's web interface on the local network while it is running; off by default, address and access code on the screen (ADR-0009, ADR-0012). It does not affect PS2 and Samba.
+- Fallback if SMBv1 setup proves too heavy: a built-in minimal SMB1 server on a non-standard port (the SMB port in OPL is configurable, `smb_port`), so as not to conflict with the system SMB on 445.
 
-SMB-помощник (NET-2), внутренний HDD через hdl-dump/pfsshell, затем нативно (HDD-1), NBD (HDD-2), сведения об игре из ScreenScraper (META-4; картинки — ADR-0035), pnach → cht (CHT-2), менеджер сейвов VMC (VMC-2), установка загрузчика внутрь образа карты памяти на SD эмулятора (LDR-5), обложки PSBBN и иконки HDD-OSD (ART-7), экспорт CSV/HTML (LIB-6), профили NHDDL/Neutrino и PSBBN, глобальные CFG (CFG-4).
+SMB assistant (NET-2), internal HDD via hdl-dump/pfsshell, then natively (HDD-1), NBD (HDD-2), game information from ScreenScraper (META-4; images — ADR-0035), pnach → cht (CHT-2), VMC save manager (VMC-2), installing the loader inside the memory card image on the emulator SD (LDR-5), PSBBN covers and HDD-OSD icons (ART-7), CSV/HTML export (LIB-6), NHDDL/Neutrino and PSBBN profiles, global CFG (CFG-4).

@@ -47,9 +47,6 @@ interface Method {
   paths: string[];
 }
 
-/** OPL's language pack names (`lang_Russian.lng`) by interface language; English is OPL's own. */
-const oplLanguages: Partial<Record<Language, string>> = { ru: "Russian" };
-
 type MethodLabel = "fmcb" | "ps2bbl" | "unknown" | "app" | "appMx4sio" | "card" | "custom";
 const labelled = new Set<string>(["fmcb", "ps2bbl", "unknown", "app", "card", "custom"]);
 
@@ -79,11 +76,10 @@ interface Form {
   method: string | null;
   build: string | null;
   path: string;
-  language: boolean;
   starter: boolean;
 }
 
-const freshForm = (): Form => ({ target: null, method: null, build: null, path: "", language: false, starter: false });
+const freshForm = (): Form => ({ target: null, method: null, build: null, path: "", starter: false });
 
 /**
  * "Install loader…" (LDR-3, BOOT-1, ADR-0044): where the device will
@@ -154,9 +150,6 @@ export function InstallLoaderDialog({
     retry: false,
   });
   const uiLanguage: Language = isLanguage(i18n.resolvedLanguage) ? i18n.resolvedLanguage : "en";
-  const language = oplLanguages[uiLanguage];
-  const offersLanguage = language !== undefined && offer.data?.languages != null;
-  const wantsLanguage = form.language && offersLanguage;
   const starterOffered = !simple && target === "usb";
 
   const set = (patch: Partial<Form>) => setForm((f) => ({ ...f, ...patch }));
@@ -200,7 +193,7 @@ export function InstallLoaderDialog({
     if (!offer.data || !build || !method) return;
     setBusy("download");
     try {
-      const file = await downloadLoader(transport, offer.data, wantsLanguage, mirror);
+      const file = await downloadLoader(transport, offer.data, false, mirror);
       const request: InstallRequest = {
         type: "PlanInstallLoader",
         root: device.root,
@@ -209,7 +202,6 @@ export function InstallLoaderDialog({
         presets: method.presets,
         ...(method.id === "custom" ? { path: form.path.trim() } : {}),
         device: target,
-        ...(wantsLanguage ? { language } : {}),
         ...(starterOffered && form.starter ? { starterSettings: true } : {}),
       };
       setPlanned(request);
@@ -399,24 +391,9 @@ export function InstallLoaderDialog({
                   </>
                 )}
 
-                {!card && (offersLanguage || starterOffered) && (
+                {!card && starterOffered && (
                   <fieldset className="flex flex-col gap-2">
                     <legend className="mb-2 text-sm font-medium">{t("loaderInstall.optionsLegend")}</legend>
-                    {offersLanguage && (
-                      <Label htmlFor={`${ids}-language`} className="items-start font-normal">
-                        <Checkbox
-                          id={`${ids}-language`}
-                          checked={form.language}
-                          onCheckedChange={(on) => set({ language: on === true })}
-                          className="mt-0.5"
-                          data-testid="loader-language"
-                        />
-                        <span>
-                          {t("loaderInstall.language", { language: t(`languages.${uiLanguage}`) })}
-                          <span className="block text-xs text-muted-foreground">{t("loaderInstall.languageHint")}</span>
-                        </span>
-                      </Label>
-                    )}
                     {starterOffered && (
                       <Label htmlFor={`${ids}-starter`} className="items-start font-normal">
                         <Checkbox

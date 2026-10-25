@@ -17,11 +17,9 @@ authors = "ps2homebrew and the Open PS2 Loader contributors"
 
 [summary]
 en = "The official beta, rebuilt on every change to OPL: exFAT, ZSO, up to 64 pieces per game and the latest compatibility fixes."
-ru = "Официальная бета, собирается при каждом изменении OPL: exFAT, ZSO, до 64 кусков на игру, свежие исправления совместимости."
 
 [limits]
 en = "A beta without a fixed version: the build behind the tag is replaced in place. Covers must be PNG."
-ru = "Бета без неизменной версии: сборка под тегом заменяется на месте. Обложки — только PNG."
 
 [[docs]]
 kind = "readme"

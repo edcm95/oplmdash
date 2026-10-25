@@ -1,5 +1,5 @@
 //! Ready-made images for the `SYSTEM.CNF` cases OPL handles differently
-//! (IMP-2; research/02 §4.3; TESTING.md "Фикстуры").
+//! (IMP-2; research/02 §4.3; TESTING.md "Fixtures").
 
 use crate::content::Content;
 use crate::iso::{IsoBuilder, VirtualIso};

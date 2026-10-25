@@ -1,51 +1,51 @@
-# M5, PR 2a — чек-лист: картинки всех типов, наборы картинок, обложки и проверка дампов при добавлении
+# M5, PR 2a — checklist: all picture types, picture sets, covers and dump verification when adding
 
-Второй PR вехи M5, часть «a» (ветка `m5/add-art-and-checks`: ART-2, ART-3, ART-5, ART-8, GAME-5 при добавлении, названия из базы META-1). Проверяет владелец на своей PS2. Отмечайте пункты по мере прохождения; замечания — отдельными маленькими PR. Общие правила тестовых данных — в [TESTING.md](../TESTING.md).
+The milestone M5's second PR, part "a" (branch `m5/add-art-and-checks`: ART-2, ART-3, ART-5, ART-8, GAME-5 when adding, titles from the database META-1). The owner checks it on their PS2. Tick items as you go; report issues in separate small PRs. General test-data rules — in [TESTING.md](../TESTING.md).
 
-Рассчитано на флешку E: (FAT32, серийный номер тома `7E1CD2C5`), OPL 1.2.0 beta и OPL 1.1.0 с карты FreeMcBoot. Каждая запись на E: идёт через план; подтверждайте только их. Нужен интернет (обложки, DAT Redump).
+Intended for stick E: (FAT32, volume serial `7E1CD2C5`), OPL 1.2.0 beta and OPL 1.1.0 from the FreeMcBoot card. Every write to E: goes through a plan; confirm only those. The internet is needed (covers, Redump DAT).
 
-## Подготовка
+## Setup
 
-- [ ] 1. Запустить `pnpm tauri dev` из `apps/desktop`. «Настройки → Библиотека»: профиль `OPL 1.2.0 beta`, имена `ID.Название.iso`. В «Настройках» включены «Скачивать обложки для добавляемых игр», «Названия из базы при добавлении игр» и «Проверять дампы при добавлении игр» (по умолчанию так и есть).
-- [ ] 2. DAT Redump скачан («Настройки → Проверка дампов (Redump)»; сделано в чек-листе M5 PR 1, п. 5).
-- [ ] 3. Тестовые файлы уже лежат в `D:\yaoplm-testdata\out\m5-pr2a\` (их подготовил агент, всё сгенерировано, коммерческого ничего нет):
-  - `cover test.iso` — wLaunchELF с ID `SLUS_200.62`. ID взят из встроенной базы («Grand Theft Auto III»), чтобы по нему нашлись название и обложка; внутри только wLaunchELF;
-  - `sets\OPLM art test.zip` — набор в раскладке резервной копии OPL Manager: `PS2/SLUS_200.62/SLUS_200.62_ICO.png`, `_COV2.jpg`, `_LAB.jpg`, `_LGO.png`, `_SCR_00.jpg`, `_SCR_01.jpg`, `_SCR_02.jpg` и одна картинка для игры `SLES_888.88`, которой на флешке нет. Каждая картинка — цветная карточка с названием своего типа, чтобы на экране было видно, что куда попало;
-  - `sets\art.tar` — `SLUS_200.62_BG.png` (фон).
-- [ ] 4. По желанию: ваша собственная игра на CD в формате Redump (`.cue` и `.bin`, без переконвертации). Только на ней можно увидеть «Подтверждён» по дорожке данных.
+- [ ] 1. Run `pnpm tauri dev` from `apps/desktop`. "Settings → Library": profile `OPL 1.2.0 beta`, names `ID.Title.iso`. In "Settings" "Download covers for added games", "Titles from the database when adding games" and "Verify dumps when adding games" are enabled (this is the default).
+- [ ] 2. The Redump DAT is downloaded ("Settings → Dump verification (Redump)"; done in the M5 PR 1 checklist, item 5).
+- [ ] 3. The test files are already in `D:\yaoplm-testdata\out\m5-pr2a\` (prepared by the agent, everything generated, nothing commercial):
+   - `cover test.iso` — wLaunchELF with ID `SLUS_200.62`. The ID is taken from the built-in database ("Grand Theft Auto III") so that a title and cover are found for it; inside there is only wLaunchELF;
+   - `sets\OPLM art test.zip` — a set in the OPL Manager backup layout: `PS2/SLUS_200.62/SLUS_200.62_ICO.png`, `_COV2.jpg`, `_LAB.jpg`, `_LGO.png`, `_SCR_00.jpg`, `_SCR_01.jpg`, `_SCR_02.jpg` and one picture for the game `SLES_888.88`, which is not on the stick. Each picture is a coloured card with its type name, so that the screen shows what went where;
+   - `sets\art.tar` — `SLUS_200.62_BG.png` (background).
+- [ ] 4. Optional: your own game on CD in Redump format (`.cue` and `.bin`, without reconversion). Only with it can you see "Verified" by the data track.
 
-## Добавление с обложкой, названием и проверкой (на ПК)
+## Adding with a cover, title and verification (on the PC)
 
-- [ ] 5. «Добавить игры» → «Добавить файлы…» → `cover test.iso` → «Показать план». В плане название «Grand Theft Auto III» и заметка «Во встроенной базе SLUS_200.62 называется «Grand Theft Auto III»». Под планом идёт «Поиск обложек для добавляемых игр…», кнопка подтверждения недоступна, пока план обновляется. Затем в плане появляется транзакция «… обложка» с `ART/SLUS_200.62_COV.png`.
-- [ ] 6. Выключить «Названия из базы» на экране добавления: название в плане становится «cover test». Включить обратно.
-- [ ] 7. «Подтвердить и выполнить». В журнале задания игра и её обложка; блок «Проверка дампов: 1» с вердиктом «Плохой дамп». Это правильно: ID принадлежит настоящей игре в Redump, а внутри wLaunchELF.
-- [ ] 8. Карточка игры → раздел «Картинки»: восемь слотов, заполнен только «Обложка». У значка, задней обложки, корешка и фона кнопка «Скачать» недоступна (открытых источников нет). У «Скриншот», «Второй скриншот» и «Логотип» нажать «Скачать»: окно показывает варианты из libretro-thumbnails, уже уменьшенные (или «Ни в одном источнике такой картинки нет.»). «Выбрать эту» → план → подтвердить. Логотип не растянут: надпись сохраняет пропорции.
-- [ ] 9. «Скачать» у слота «Обложка»: варианты — плоская обложка xlenore, 3-D обложка xlenore, коробка libretro (что найдётся). «Выбрать эту» на 3-D → план замены → подтвердить; старая обложка уходит в `E:\.yaoplm\backup\`. Затем вернуть плоскую тем же способом.
+- [ ] 5. "Add games" → "Add files…" → `cover test.iso` → "Show plan". The plan has the title "Grand Theft Auto III" and the note "In the built-in database SLUS_200.62 is called "Grand Theft Auto III"". Under the plan "Searching covers for added games…" runs, the confirm button is unavailable while the plan is updating. Then a "… cover" transaction appears in the plan with `ART/SLUS_200.62_COV.png`.
+- [ ] 6. Turn off "Titles from the database" on the add screen: the title in the plan becomes "cover test". Turn it back on.
+- [ ] 7. "Confirm and execute". In the job log the game and its cover; the "Dump verification: 1" block with the verdict "Bad dump". This is correct: the ID belongs to a real game in Redump, and inside is wLaunchELF.
+- [ ] 8. The game card → "Pictures" section: eight slots, only "Cover" is filled. For the icon, back cover, spine and background the "Download" button is unavailable (there are no open sources). For "Screenshot", "Second screenshot" and "Logo" click "Download": the dialog shows variants from libretro-thumbnails, already resized (or "No source has such a picture."). "Choose this one" → plan → confirm. The logo is not stretched: the text keeps its proportions.
+- [ ] 9. "Download" for the "Cover" slot: variants — the flat xlenore cover, the 3-D xlenore cover, the libretro box (whatever is found). "Choose this one" on the 3-D → replacement plan → confirm; the old cover goes to `E:\.yaoplm\backup\`. Then restore the flat one the same way.
 
-## Импорт наборов картинок (на ПК)
+## Importing picture sets (on the PC)
 
-- [ ] 10. Библиотека → «Импортировать картинки» → «Добавить архивы…» → `OPLM art test.zip` и `art.tar` (можно перетащить их в окно). Все типы отмечены, «Заменять картинки, которые уже есть на носителе» выключено → «Прочитать наборы».
-- [ ] 11. План: значок, задняя обложка, корешок, логотип, скриншот (из `SCR_00`), второй скриншот (из `SCR_01`), фон (из `art.tar`); `SCR_02` не используется. Заметки «Оставлено картинок, которые уже есть на носителе: N» (картинки из п. 8) и «Пропущено картинок для игр, которых нет на носителе: 1». Подтвердить.
-- [ ] 12. Карточка игры: все восемь слотов заполнены цветными карточками с подписями типов.
-- [ ] 13. Повторить импорт с включённым «Заменять картинки…»: план заменяет и картинки из п. 8, старые уходят в `E:\.yaoplm\backup\`. Подтвердить.
+- [ ] 10. Library → "Import pictures" → "Add archives…" → `OPLM art test.zip` and `art.tar` (you can drag them into the window). All types are ticked, "Replace pictures already on the device" is off → "Read sets".
+- [ ] 11. The plan: icon, back cover, spine, logo, screenshot (from `SCR_00`), second screenshot (from `SCR_01`), background (from `art.tar`); `SCR_02` is not used. Notes "Pictures already on the device left as is: N" (the pictures from item 8) and "Pictures skipped for games not on the device: 1". Confirm.
+- [ ] 12. The game card: all eight slots are filled with coloured cards labelled by type.
+- [ ] 13. Repeat the import with "Replace pictures…" enabled: the plan replaces the pictures from item 8 too, and the old ones go to `E:\.yaoplm\backup\`. Confirm.
 
-## На консоли
+## On the console
 
-- [ ] 14. OPL 1.2.0 beta, USB, в настройках OPL включён «Cover Art». В списке «Grand Theft Auto III» с обложкой и жёлтым значком «ICO». Посмотрите, чётко ли выглядит значок: стандартная тема рисует его 128×128, а YAOPLM пишет 64×64, как все менеджеры. Если значок заметно размытый, напишите — тогда для OPL 1.2 будем писать 128×128.
-- [ ] 15. Квадрат на этой игре → страница сведений: фон «BG» и два скриншота «SCR» и «SCR2». Задняя обложка, корешок и логотип в стандартной теме не показываются (только в темах, которые их используют).
-- [ ] 16. Крестик: запускается wLaunchELF.
-- [ ] 17. OPL 1.1.0: обложка и значок видны.
+- [ ] 14. OPL 1.2.0 beta, USB, "Cover Art" enabled in the OPL settings. In the list "Grand Theft Auto III" with a cover and a yellow "ICO" icon. Check whether the icon looks sharp: the standard theme draws it at 128×128, while YAOPLM writes 64×64, like all managers. If the icon is noticeably blurry, write to us — then for OPL 1.2 we will write 128×128.
+- [ ] 15. Square on this game → the details page: the "BG" background and two screenshots "SCR" and "SCR2". The back cover, spine and logo are not shown in the standard theme (only in themes that use them).
+- [ ] 16. Cross: wLaunchELF launches.
+- [ ] 17. OPL 1.1.0: the cover and icon are visible.
 
-## Проверка CD по дорожке данных
+## Checking a CD by the data track
 
-- [ ] 18. Добавить `D:\yaoplm-testdata\out\m5-packed\YAOP_000.01.wLaunchELF.cue` (CD с аудиодорожкой). В журнале «Проверка дампов: 1», вердикт «Неизвестен: Нет в Redump». В карточке → «Проверить дамп» → «Хеши»: есть блок «Дорожка данных добавленного дампа»; SHA-1 образа тот же, что в чек-листе M5 PR 1, п. 11.
-- [ ] 19. По желанию, своя игра (п. 4): добавить её `.cue`. Ожидается «Подтверждён» и пояснение «Проверено по дорожке данных BIN или CHD, из которого игра добавлена». Затем «Обновить» библиотеку: вердикт остаётся. Если «Плохой дамп» или «Неизвестен» — пришлите название и регион игры и сколько у неё файлов `.bin`.
-- [ ] 20. Выключить «Проверять дампы при добавлении игр» и добавить любую игру: в журнале задания нет блока «Проверка дампов».
+- [ ] 18. Add `D:\yaoplm-testdata\out\m5-packed\YAOP_000.01.wLaunchELF.cue` (a CD with an audio track). The log says "Dump verification: 1", the verdict "Unknown: Not in Redump". In the card → "Verify dump" → "Hashes": there is a "Data track of the added dump" block; the image SHA-1 is the same as in the M5 PR 1 checklist, item 11.
+- [ ] 19. Optional, your own game (item 4): add its `.cue`. Expected "Verified" and the explanation "Checked by the data track of the BIN or CHD the game was added from". Then "Refresh" the library: the verdict stays. If "Bad dump" or "Unknown" — send the game title and region and how many `.bin` files it has.
+- [ ] 20. Turn off "Verify dumps when adding games" and add any game: the job log has no "Dump verification" block.
 
-## Уборка
+## Cleanup
 
-- [ ] 21. Удалить «Grand Theft Auto III» и `YAOP_000.01` вместе со связанными файлами (картинки уходят вместе с игрой) — план удаления с отдельным подтверждением.
+- [ ] 21. Delete "Grand Theft Auto III" and `YAOP_000.01` together with related files (pictures go with the game) — a deletion plan with a separate confirmation.
 
-## Что прислать
+## What to report
 
-Фото экрана OPL для пп. 14, 15 и 17; снимки планов из пп. 5, 11 и 13; результат п. 19, если проверяли свою игру; текст любой ошибки из диалога плана или задания.
+A screen photo of OPL for items 14, 15 and 17; plan screenshots from items 5, 11 and 13; the result of item 19 if you checked your own game; the text of any error from the plan or job dialog.

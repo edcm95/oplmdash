@@ -297,7 +297,7 @@ enum LoaderCommand {
     /// List the catalogue: each build, its channel, presets and licence.
     Ls {
         /// Language of the build descriptions.
-        #[arg(long, default_value = "en", value_parser = ["en", "ru"])]
+        #[arg(long, default_value = "en", value_parser = ["en"])]
         lang: String,
         /// Print the answer as JSON.
         #[arg(long)]
@@ -396,7 +396,7 @@ struct LoaderInstall {
     /// The device is an SD card for MX4SIO, not a USB stick.
     #[arg(long)]
     mx4sio: bool,
-    /// Install an OPL menu language from the release's pack: Russian, ...
+    /// Install an OPL menu language from the release's pack.
     #[arg(long, value_name = "NAME")]
     language: Option<String>,
     /// Write usb_mode=2 (and the language) to conf_opl.cfg on the device.

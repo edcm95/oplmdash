@@ -93,10 +93,10 @@ v0.1 operations. Prefer a read-only `/opl` mount where possible.
 - [Security findings](docs/security/FINDINGS.md) (EN)
 - [Security audit report](docs/security/AUDIT_REPORT.md) (EN)
 - [Deployment security checklist](docs/security/DEPLOYMENT_CHECKLIST.md) (EN)
-- [Upstream specification](docs/SPEC.md) (RU)
-- [Upstream architecture](docs/ARCHITECTURE.md) (RU)
-- [Upstream roadmap](docs/ROADMAP.md) (RU)
-- [Upstream decisions](docs/DECISIONS.md) (RU)
+- [Upstream specification](docs/SPEC.md) (EN)
+- [Upstream architecture](docs/ARCHITECTURE.md) (EN)
+- [Upstream roadmap](docs/ROADMAP.md) (EN)
+- [Upstream decisions](docs/DECISIONS.md) (EN)
 - [OPL format research](docs/research/02-opl-formats.md) (EN)
 
 ## Relationship to YAOPLM
