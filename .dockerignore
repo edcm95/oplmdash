@@ -1,0 +1,38 @@
+# Version control and local tooling
+.git
+.gitignore
+.github
+.claude
+.vscode
+.idea
+
+# Build output
+target
+**/target
+node_modules
+**/node_modules
+web/dist
+web/test-results
+playwright-report
+test-results
+*.tsbuildinfo
+.vite
+
+# Documentation and fuzzing are not needed to build the image
+docs
+fuzz
+
+# User data and secrets
+opl
+.env
+.env.*
+!.env.example
+testdata
+*.iso
+*.zso
+*.cso
+*.bin
+*.cue
+*.chd
+*.vcd
+ul.*.*
