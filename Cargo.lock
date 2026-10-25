@@ -6830,12 +6830,14 @@ dependencies = [
  "rust-embed",
  "serde",
  "serde_json",
+ "sha2 0.11.1",
  "tempfile",
  "tokio",
  "tower",
  "tracing",
  "tracing-subscriber",
  "yaoplm-api",
+ "yaoplm-device",
  "yaoplm-formats",
 ]
 

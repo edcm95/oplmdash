@@ -35,6 +35,12 @@ impl Listing {
         };
         for entry in read {
             let entry = entry?;
+            // A symlink in the library root may point anywhere; the scanner
+            // reads only real files and folders inside the root (F-11).
+            let file_type = entry.file_type()?;
+            if file_type.is_symlink() {
+                continue;
+            }
             let Ok(name) = entry.file_name().into_string() else {
                 continue;
             };
@@ -42,7 +48,7 @@ impl Listing {
             listing.entries.push(Entry {
                 name,
                 path: entry.path(),
-                is_dir: meta.is_dir(),
+                is_dir: file_type.is_dir(),
                 len: meta.len(),
                 modified: meta
                     .modified()

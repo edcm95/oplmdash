@@ -20,6 +20,9 @@ fn state(token: Option<&str>) -> AppState {
             token: token.map(str::to_owned),
             roots: Vec::new(),
             loopback_only: true,
+            uploads_enabled: false,
+            rpc_allow_all: false,
+            max_upload_size: 4 * 1024 * 1024 * 1024,
         },
     )
 }
@@ -227,6 +230,9 @@ async fn paths_outside_roots_are_forbidden() {
             token: None,
             roots: Vec::new(),
             loopback_only: true,
+            uploads_enabled: false,
+            rpc_allow_all: false,
+            max_upload_size: 4 * 1024 * 1024 * 1024,
         },
     );
     let body = json!({"type": "ScanLibrary", "root": dir}).to_string();

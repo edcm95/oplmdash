@@ -1,0 +1,37 @@
+name: oplmdash
+
+services:
+  oplmdash:
+    build:
+      context: .
+      dockerfile: packaging/docker/Dockerfile
+    image: ${OPLMDASH_IMAGE:-ghcr.io/edcm95/oplmdash:dev}
+    container_name: oplmdash
+    restart: unless-stopped
+    ports:
+      - "${OPLMDASH_PORT:-7878}:7878"
+    environment:
+      YAOPLM_TOKEN: ${YAOPLM_TOKEN:?set YAOPLM_TOKEN in .env}
+      YAOPLM_BIND: 0.0.0.0:7878
+      YAOPLM_DATA_DIR: /data
+      YAOPLM_UPLOADS: ${YAOPLM_UPLOADS:-false}
+      YAOPLM_RPC_ALLOW_ALL: ${YAOPLM_RPC_ALLOW_ALL:-false}
+      YAOPLM_MAX_UPLOAD_SIZE: ${YAOPLM_MAX_UPLOAD_SIZE:-4294967296}
+      RUST_LOG: ${RUST_LOG:-info}
+    volumes:
+      - ${OPL_ROOT:-./opl}:/opl
+      - oplmdash-data:/data
+    user: "${PUID:-1000}:${PGID:-1000}"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:7878/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  oplmdash-data:

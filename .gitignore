@@ -3,6 +3,9 @@
 **/target/
 *.pdb
 
+# Local OPL mount used by compose
+/opl/
+
 # Node / web
 node_modules/
 web/dist/

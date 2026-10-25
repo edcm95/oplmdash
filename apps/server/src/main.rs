@@ -32,6 +32,25 @@ struct Args {
     /// Defaults to the platform's app data folder.
     #[arg(long, env = "YAOPLM_DATA_DIR", value_name = "DIR")]
     data_dir: Option<PathBuf>,
+
+    /// Accept uploads into a library root. Off by default (F-01, F-02).
+    #[arg(long, env = "YAOPLM_UPLOADS")]
+    uploads: bool,
+
+    /// Expose the full RPC surface. Server mode allows a safe subset by
+    /// default; this enables the deferred v0.1 operations too (F-03).
+    #[arg(long, env = "YAOPLM_RPC_ALLOW_ALL")]
+    rpc_allow_all: bool,
+
+    /// Largest upload accepted, in bytes. Defaults to 4 GiB, the largest file
+    /// FAT32 stores (F-02).
+    #[arg(
+        long,
+        env = "YAOPLM_MAX_UPLOAD_SIZE",
+        default_value_t = 4 * 1024 * 1024 * 1024,
+        value_name = "BYTES"
+    )]
+    max_upload_size: u64,
 }
 
 #[tokio::main]
@@ -74,8 +93,24 @@ async fn main() -> anyhow::Result<()> {
             token,
             roots,
             loopback_only,
+            uploads_enabled: args.uploads,
+            rpc_allow_all: args.rpc_allow_all,
+            max_upload_size: args.max_upload_size,
         },
     );
+    // F-02: sweep staging directories on startup and hourly. A restart loses
+    // in-memory sessions; without this the staged files would leak forever.
+    if args.uploads {
+        let cleanup_state = state.clone();
+        tokio::spawn(async move {
+            yaoplm_server::cleanup_stale_uploads(&cleanup_state).await;
+            let mut interval = tokio::time::interval(std::time::Duration::from_secs(3600));
+            loop {
+                interval.tick().await;
+                yaoplm_server::cleanup_stale_uploads(&cleanup_state).await;
+            }
+        });
+    }
     let listener = tokio::net::TcpListener::bind(args.bind)
         .await
         .with_context(|| format!("failed to listen on {}", args.bind))?;
